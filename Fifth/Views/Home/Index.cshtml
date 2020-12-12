@@ -4,23 +4,26 @@
 
 <div class="col-2 float-left">
     <div class="text-center">
-        <h3 class="text-monospace text-warning">Filter</h3>
+        <h3 class="text-monospace text-warning">Tags</h3>
     </div>
     <div class="p-2  tags-cloud bg-secondary border border-warning rounded">
-        <div class="d-flex flex-row flex-wrap justify-content-center">
-            <a href="" class="tag">#tag</a>
-            <a href="" class="tag">#tag</a>
-            <a href="" class="tag">#tag</a>
-            <a href="" class="tag">#tag</a>
-            <a href="" class="tag">#tag</a>
-            <a href="" class="tag">#tag</a>
-            <a href="" class="tag">#tag</a>
-            <a href="" class="tag">#tag</a>
-            <a href="" class="tag">#tag</a>
+        <div id="tagsCloud" class="d-flex flex-row flex-wrap justify-content-center">
+            <a href="" data-selected="0" class="tag">#tag</a>
         </div>
     </div>
 </div>
-<div class="col-10 offset-2">
+
+<div class="col-2 float-right">
+    <div class="text-center">
+        <h3 class="text-monospace text-warning">Filter</h3>
+    </div>
+    <div class="p-2  tags-cloud bg-secondary border border-warning rounded">
+        <div id="tagsFilter" class="d-flex flex-row flex-wrap justify-content-center">
+        </div>
+    </div>
+</div>
+
+<div class="col-8 offset-2">
     <div class="text-center">
         <h3 class="text-monospace text-warning">Games</h3>
     </div>
@@ -30,7 +33,7 @@
                 <div class="card-body border rounded border-warning text-center">
                     <h5 class="card-title">Your game</h5>
                     <span class="card-text"></span>
-                    <a asp-action="Game" class="text-warning">Create</a>
+                    <a id="newGame" class="text-warning"  asp-action="Game">Create</a>
                 </div>
             </div>
         </div>
@@ -99,3 +102,48 @@
         </div>
     </div>
 </div>
+
+<div id="modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered text-warning">
+        <div class="modal-content bg-secondary border border-warning rounded">
+            <div class="modal-header">
+                <h4 class="modal-title">New game</h4>
+                <a href="#" class="btn text-white bg-dark btn-lg close" rel="modal:close"
+                   aria-hidden="true">&times;</a>
+            </div>
+            <div class="modal-body">
+                <form class="horizontal-from d-flex flex-column justify-content-center">
+                    <div class="text-center p-2">
+                        <h5>
+                            <label for="name">Your name:</label>
+                        </h5>
+                        <input type="text" class="bg-dark text-warning w-75" />
+                    </div>
+                    <div class="text-center p-2">
+                        <h5>
+                            <label>Game name:</label>
+                        </h5>
+                        <input id='name' type="text" class="bg-dark text-warning w-75" />
+                    </div>
+                    <div class="p-2">
+                        <h5 class="text-center">
+                            <label class="w-25">Edit tags:</label>
+                        </h5>
+                        <input id="tagsInput" class="bg-dark text-warning text-monospace col-8 offset-2" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn text-warning bg-dark btn-lg" rel="modal:close">Create</a>
+                <a href="#" class="btn text-warning bg-dark btn-lg " rel="modal:close">Close</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/tagify/tagify.min.js"></script>
+    <script src="~/lib/tagify/jQuery.tagify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <script src="~/js/index.js"></script>
+}

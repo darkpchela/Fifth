@@ -101,7 +101,7 @@ body {
 }
 
 .game-board .btn:disabled{
-  opacity: 100%;
+  opacity: 100;
 }
 
 .game-map{
@@ -125,5 +125,8 @@ a.tag{
 
 .tags-cloud{
   min-width: 10vw;
-  
+}
+
+.modal{
+  background-color: rgba(0, 0, 0, 0.5)
 }
