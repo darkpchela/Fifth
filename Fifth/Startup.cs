@@ -1,5 +1,6 @@
 using Fifth.Interfaces;
 using Fifth.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -21,11 +22,14 @@ namespace Fifth
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddHttpContextAccessor();
             services.AddSignalR();
             services.AddScoped<IGameManageService, GameManageService>();
-            services.AddDbContext<FifthDbContext>(o =>
-            o.UseSqlServer(Configuration.GetConnectionString("Default"))
-            );
+            services.AddDbContext<FifthDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("Default")));
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));
+            services.AddDistributedMemoryCache();
+            services.AddSession();
+            services.AddTransient<ICookieAuthenticationService, CookieAuthenticationService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -41,6 +45,8 @@ namespace Fifth
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseSession();
 
             app.UseRouting();
 

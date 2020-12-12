@@ -28,9 +28,25 @@ namespace Fifth.Services
             throw new NotImplementedException();
         }
 
-        public async Task CreateGameAsync(GameSessionVM createGameVM)
+        public async Task<bool> EnterGameAsync(string connectionId, string userName, int gameId)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.UserName) ?? await CreateTempUser();
+            var game = await dbContext.GameSessions.FirstOrDefaultAsync(s => s.SessionId == gameId);
+            if (game is null || game.Started)
+                return false;
+
+            var newPlayer = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == userName);
+            if (newPlayer is null)
+                return false;
+
+            game.OpponentId = newPlayer.Id;
+            game.Started = true;
+            await dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<int> CreateGameAsync(GameSessionVM createGameVM)
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.UserName) ?? await CreateNewUser(createGameVM);
             var session = new GameSession
             {
                 OwnerId = user.Id,
@@ -39,6 +55,7 @@ namespace Fifth.Services
             dbContext.GameSessions.Add(session);
             await dbContext.SaveChangesAsync();
             OnGameCreated(session);
+            return session.SessionId;
         }
 
         private async void OnGameCreated(GameSession gameSession)
@@ -51,12 +68,11 @@ namespace Fifth.Services
             await hubContext.Clients.All.SendAsync("OnGameCreated", sessionVm);
         }
 
-        private async Task<User> CreateTempUser()
+        private async Task<User> CreateNewUser(GameSessionVM gameSessionVM)
         {
             var user = new User
             {
-                Login = Guid.NewGuid().ToString(),
-                IsTemp = true
+                Login = gameSessionVM.UserName
             };
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();

@@ -1,6 +1,7 @@
 ﻿using Fifth.Interfaces;
 using Fifth.Models;
 using Fifth.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -33,16 +34,17 @@ namespace Fifth.Controllers
         }
 
         [HttpGet]
-        public IActionResult Game()
+        public IActionResult Game(int id)
         {
+            HttpContext.Session.SetInt32("gameId", id);
             return View();
         }
 
         [HttpPost]
-        public async void CreateGame(GameSessionVM createGameVM)
+        public async Task<IActionResult> CreateGame(GameSessionVM createGameVM)
         {
-            await gameManageService.CreateGameAsync(createGameVM);
-            //return RedirectToAction(nameof(Index));
+            int id = await gameManageService.CreateGameAsync(createGameVM);
+            return RedirectToAction(nameof(Game), id);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
