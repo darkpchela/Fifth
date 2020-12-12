@@ -5,7 +5,7 @@ namespace Fifth.Interfaces
 {
     public interface IGameManageService
     {
-        Task CreateGameAsync(CreateGameVM gameSession);
+        Task CreateGameAsync(GameSessionVM gameSession);
 
         Task CloseGameAsync();
     }

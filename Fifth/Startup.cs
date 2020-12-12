@@ -2,6 +2,7 @@ using Fifth.Interfaces;
 using Fifth.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,8 +22,10 @@ namespace Fifth
         {
             services.AddControllersWithViews();
             services.AddSignalR();
-            services.AddSingleton<IGameManageService, GameManageService>();
-
+            services.AddScoped<IGameManageService, GameManageService>();
+            services.AddDbContext<FifthDbContext>(o =>
+            o.UseSqlServer(Configuration.GetConnectionString("Default"))
+            );
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

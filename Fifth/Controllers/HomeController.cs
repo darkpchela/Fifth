@@ -39,7 +39,7 @@ namespace Fifth.Controllers
         }
 
         [HttpPost]
-        public async void CreateGame(CreateGameVM createGameVM)
+        public async void CreateGame(GameSessionVM createGameVM)
         {
             await gameManageService.CreateGameAsync(createGameVM);
             //return RedirectToAction(nameof(Index));

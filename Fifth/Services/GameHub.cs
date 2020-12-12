@@ -10,7 +10,7 @@ namespace Fifth.Services
     {
         public async override Task OnConnectedAsync()
         {
-            await Clients.All.SendAsync("GameHubTest", "You connected to gameHUB");
+            await Clients.All.SendAsync("Test", $"{Context.ConnectionId} connected to game");
             await base.OnConnectedAsync();
         }
     }

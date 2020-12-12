@@ -1,11 +1,10 @@
-﻿using Fifth.Etc;
-using Fifth.Interfaces;
+﻿using Fifth.Interfaces;
 using Fifth.Models;
 using Fifth.ViewModels;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Fifth.Services
@@ -16,11 +15,12 @@ namespace Fifth.Services
 
         private IHubContext<MainHub> hubContext;
 
-        private List<string> connections = new List<string>();
+        private FifthDbContext dbContext;
 
-        public GameManageService(IHubContext<MainHub> hubContext)
+        public GameManageService(IHubContext<MainHub> hubContext, FifthDbContext dbContext)
         {
             this.hubContext = hubContext;
+            this.dbContext = dbContext;
         }
 
         public Task CloseGameAsync()
@@ -28,21 +28,45 @@ namespace Fifth.Services
             throw new NotImplementedException();
         }
 
-        public async Task CreateGameAsync(CreateGameVM createGameVM)
+        public async Task CreateGameAsync(GameSessionVM createGameVM)
         {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.UserName) ?? await CreateTempUser();
             var session = new GameSession
             {
-                Owner = createGameVM.UserName,
-                SessionName = createGameVM.GameName,
-                Tags = createGameVM.Tags
+                OwnerId = user.Id,
+                SessionName = createGameVM.GameName
             };
-            gameSessions.Add(session);
+            dbContext.GameSessions.Add(session);
+            await dbContext.SaveChangesAsync();
             OnGameCreated(session);
         }
 
         private async void OnGameCreated(GameSession gameSession)
         {
-            await hubContext.Clients.All.SendAsync("OnGameCreated", new CreateGameVM { UserName="a", GameName="b" });
+            var sessionVm = new GameSessionVM
+            {
+                GameName = gameSession.SessionName,
+                UserName = (await dbContext.Users.FirstOrDefaultAsync(u => u.Id == gameSession.OwnerId)).Login
+            };
+            await hubContext.Clients.All.SendAsync("OnGameCreated", sessionVm);
         }
+
+        private async Task<User> CreateTempUser()
+        {
+            var user = new User
+            {
+                Login = Guid.NewGuid().ToString(),
+                IsTemp = true
+            };
+            dbContext.Users.Add(user);
+            await dbContext.SaveChangesAsync();
+            return user;
+        }
+
+        //private async IEnumerable<Tag> MapTags(IEnumerable<string> tags)
+        //{
+        //    var allTags = await dbContext.Tags.ToListAsync();
+
+        //}
     }
 }

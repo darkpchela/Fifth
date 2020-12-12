@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Fifth.ViewModels
 {
-    public class CreateGameVM
+    public class GameSessionVM
     {
         [Required]
         [MinLength(3)]

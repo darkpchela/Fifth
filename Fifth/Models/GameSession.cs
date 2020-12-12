@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Fifth.Models
 {
     public class GameSession
     {
-        public string Owner { get; set; }
+        [Key]
+        public int SessionId { get; set; }
 
-        public string Opponent { get; set; }
+        public int OwnerId { get; set; }
+
+        public int OpponentId { get; set; }
 
         public string SessionName { get; set; }
-
-        public string SessionId { get; set; }
-
-        public IList<string> Tags { get; set; }
     }
 }
