@@ -1,6 +1,6 @@
 using System;
 
-namespace Fifth.Models
+namespace Fifth.ViewModels
 {
     public class ErrorViewModel
     {

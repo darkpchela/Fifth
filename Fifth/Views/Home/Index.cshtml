@@ -1,7 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
+@model CreateGameVM
 <div class="col-2 float-left">
     <div class="text-center">
         <h3 class="text-monospace text-warning">Tags</h3>
@@ -27,13 +27,13 @@
     <div class="text-center">
         <h3 class="text-monospace text-warning">Games</h3>
     </div>
-    <div class="d-flex flex-row flex-wrap bg-dark justify-content-around p-3 border border-warning rounded">
+    <div id="gameCards" class="d-flex flex-row flex-wrap bg-dark justify-content-around p-3 border border-warning rounded">
         <div class="p-2">
             <div class="ml-1 mr-1 bg-success">
                 <div class="card-body border rounded border-warning text-center">
                     <h5 class="card-title">Your game</h5>
                     <span class="card-text"></span>
-                    <a id="newGame" class="text-warning"  asp-action="Game">Create</a>
+                    <a id="newGame" class="text-warning">Create</a>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
                 <div class="card-body border rounded border-warning text-center">
                     <h5 class="card-title">First game</h5>
                     <span class="card-text"></span>
-                    <a href="Game.html" class="text-warning">Join</a>
+                    <a asp-action="Game" class="text-warning">Join</a>
                 </div>
             </div>
         </div>
@@ -111,32 +111,33 @@
                 <a href="#" class="btn text-white bg-dark btn-lg close" rel="modal:close"
                    aria-hidden="true">&times;</a>
             </div>
-            <div class="modal-body">
-                <form class="horizontal-from d-flex flex-column justify-content-center">
+            <form asp-action="CreateGame" method="post">
+                <div class="modal-body d-flex flex-column justify-content-center">
                     <div class="text-center p-2">
                         <h5>
                             <label for="name">Your name:</label>
                         </h5>
-                        <input type="text" class="bg-dark text-warning w-75" />
+                        <input type="text" asp-for="UserName" class="bg-dark text-warning w-75" />
                     </div>
                     <div class="text-center p-2">
                         <h5>
                             <label>Game name:</label>
                         </h5>
-                        <input id='name' type="text" class="bg-dark text-warning w-75" />
+                        <input id='name' type="text" asp-for="GameName" class="bg-dark text-warning w-75" />
                     </div>
                     <div class="p-2">
                         <h5 class="text-center">
                             <label class="w-25">Edit tags:</label>
                         </h5>
-                        <input id="tagsInput" class="bg-dark text-warning text-monospace col-8 offset-2" />
+                        <input id="tagsInput" asp-for="Tags" class="bg-dark text-warning text-monospace col-8 offset-2" />
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <a href="#" class="btn text-warning bg-dark btn-lg" rel="modal:close">Create</a>
-                <a href="#" class="btn text-warning bg-dark btn-lg " rel="modal:close">Close</a>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn text-warning bg-dark btn-lg" rel="modal:close">Create</button>
+                    <a href="#" class="btn text-warning bg-dark btn-lg " rel="modal:close">Close</a>
+                    <button id="sendBtn">Test</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -146,4 +147,27 @@
     <script src="~/lib/tagify/jQuery.tagify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <script src="~/js/index.js"></script>
+    <script>
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/MainHub")
+            .build();
+
+        hubConnection.on("Test", function (data) {
+            console.log(data);
+        });
+
+        hubConnection.on("OnGameCreated", data => {
+            console.log(data);
+            let gameCardElem = '<div class="p-2"><div class="card border rounded border-warning ml-1 mr-1 bg-secondary"><div class="card-body border rounded border-warning">' +
+                `<h5 class="card-title">${data.gameName}</h5><span class="d-block card-text">${data.userName}</span><a>Play</a></div></div></div>`;
+            $('#gameCards').append(gameCardElem);
+        });
+
+        $("#sendBtn").click((e) => {
+            let message = "Test message";
+            hubConnection.invoke("Test", message);
+        });
+
+        hubConnection.start();
+    </script>
 }

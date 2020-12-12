@@ -1,4 +1,6 @@
-﻿using Fifth.Models;
+﻿using Fifth.Interfaces;
+using Fifth.Models;
+using Fifth.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,10 +14,12 @@ namespace Fifth.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IGameManageService gameManageService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IGameManageService gameManageService)
         {
             _logger = logger;
+            this.gameManageService = gameManageService;
         }
 
         public IActionResult Index()
@@ -28,9 +32,17 @@ namespace Fifth.Controllers
             return View();
         }
 
+        [HttpGet]
         public IActionResult Game()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async void CreateGame(CreateGameVM createGameVM)
+        {
+            await gameManageService.CreateGameAsync(createGameVM);
+            //return RedirectToAction(nameof(Index));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

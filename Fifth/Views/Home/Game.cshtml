@@ -26,4 +26,16 @@
 
 @section Scripts{
     <script src="~/js/game.js"></script>
+    <script>
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/GameHub")
+            .build();
+
+
+        hubConnection.on("Test", function (data) {
+            console.log(data);
+        });
+
+        hubConnection.start();
+    </script>
 }
