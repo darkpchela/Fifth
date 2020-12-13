@@ -25,7 +25,7 @@
 </div>
 
 <div class="col-8 offset-2">
-    @{ await Html.RenderPartialAsync("_GamesTable", await gameManageService.GetAllSessions());}
+    @{ await Html.RenderPartialAsync("_GamesTable", await gameManageService.GetAllSessionsAsync());}
 </div>
 
 <div id="modal" class="modal" tabindex="-1">

@@ -2,6 +2,7 @@
 using Fifth.Interfaces;
 using Fifth.Models;
 using Fifth.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,17 +14,20 @@ namespace Fifth.Services
 {
     public class GameManageService : IGameManageService
     {
-        private readonly IHubContext<MainHub> hubContext;
-
         private readonly AppDbContext dbContext;
+        
+        private readonly IHubContext<MainHub> hubContext;
 
         private readonly IMapper mapper;
 
-        public GameManageService(IHubContext<MainHub> hubContext, AppDbContext dbContext, IMapper mapper)
+        private readonly IHttpContextAccessor httpContextAccessor;
+
+        public GameManageService(IHubContext<MainHub> hubContext, AppDbContext dbContext, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             this.hubContext = hubContext;
             this.dbContext = dbContext;
             this.mapper = mapper;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public Task CloseGameAsync()
@@ -49,7 +53,7 @@ namespace Fifth.Services
 
         public async Task<int> CreateGameAsync(CreateGameVM createGameVM)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.UserName);
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == httpContextAccessor.HttpContext.User.Identity.Name);
             var session = new GameSession
             {
                 OwnerId = user.Id,
@@ -61,7 +65,7 @@ namespace Fifth.Services
             return session.Id;
         }
 
-        public async Task<IList<GameSessionVM>> GetAllSessions()
+        public async Task<IList<GameSessionVM>> GetAllSessionsAsync()
         {
             var openedSessions = dbContext.GameSessions.Where(s => !s.Started).Include(t => t.Owner);
             var VMs = mapper.ProjectTo<GameSessionVM>(openedSessions);

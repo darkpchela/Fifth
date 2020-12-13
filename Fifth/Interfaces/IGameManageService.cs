@@ -12,6 +12,6 @@ namespace Fifth.Interfaces
 
         Task<bool> EnterGameAsync(string connectionId, string userName ,int gameId);
 
-        Task<IList<GameSessionVM>> GetAllSessions();
+        Task<IList<GameSessionVM>> GetAllSessionsAsync();
     }
 }
