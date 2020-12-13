@@ -57,40 +57,43 @@
                 <a href="#" class="btn text-white bg-dark btn-lg close" rel="modal:close"
                    aria-hidden="true">&times;</a>
             </div>
-            <form asp-action="CreateGame" method="post">
-                <div class="modal-body d-flex flex-column justify-content-center">
-                    <div class="text-center p-2">
-                        <h5>
-                            <label for="name">Your name:</label>
-                        </h5>
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <input type="text" asp-for="UserName" class="bg-dark text-warning w-75" value="@User.Identity.Name" />
-                        }
-                        else
-                        {
-                            <input type="text" asp-for="UserName" class="bg-dark text-warning w-75" />
-                        }
+            @if (User.Identity.IsAuthenticated)
+            {
+                <form asp-action="CreateGame" method="post">
+                    <div class="modal-body d-flex flex-column justify-content-center">
+                        <div class="text-center p-2">
+                            <h5>
+                                <label>Game name:</label>
+                            </h5>
+                            <input id='name' type="text" asp-for="GameName" class="bg-dark text-warning form-control" />
+                        </div>
+                        <div class="p-2">
+                            <h5 class="text-center">
+                                <label class="w-25">Edit tags:</label>
+                            </h5>
+                            <input id="tagsInput" asp-for="Tags" class="bg-dark text-warning text-monospace col-8 offset-2" />
+                        </div>
                     </div>
-                    <div class="text-center p-2">
-                        <h5>
-                            <label>Game name:</label>
-                        </h5>
-                        <input id='name' type="text" asp-for="GameName" class="bg-dark text-warning w-75" />
+                    <div class="modal-footer">
+                        <button type="submit" class="btn text-warning bg-dark btn-lg" rel="modal:close">Create</button>
+                        <a href="#" class="btn text-warning bg-dark btn-lg " rel="modal:close">Close</a>
+                        <button id="sendBtn">Test</button>
                     </div>
-                    <div class="p-2">
-                        <h5 class="text-center">
-                            <label class="w-25">Edit tags:</label>
-                        </h5>
-                        <input id="tagsInput" asp-for="Tags" class="bg-dark text-warning text-monospace col-8 offset-2" />
+                </form>
+            }
+            else
+            {
+                <div>
+                    <div class="modal-body d-flex flex-column justify-content-center">
+                        <h5>Please, authorize to create a game!</h5>
+                        <a asp-action="SignIn" asp-controller="Account" class="btn text-warning bg-dark btn-lg ">Sign In</a>
+                        <a asp-action="SignUp" asp-controller="Account" class="btn text-warning bg-dark btn-lg ">Sign Up</a>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn text-warning bg-dark btn-lg " rel="modal:close">Close</a>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn text-warning bg-dark btn-lg" rel="modal:close">Create</button>
-                    <a href="#" class="btn text-warning bg-dark btn-lg " rel="modal:close">Close</a>
-                    <button id="sendBtn">Test</button>
-                </div>
-            </form>
+            }
         </div>
     </div>
 </div>
@@ -99,8 +102,12 @@
     <script src="~/lib/tagify/tagify.min.js"></script>
     <script src="~/lib/tagify/jQuery.tagify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-    <script src="~/js/index.js"></script>
+    @*<script src="~/js/index.js"></script>*@
     <script>
+        $('#newGame').click((e) => {
+            e.preventDefault();
+            $('#modal').modal('show');
+        })
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/MainHub")
             .build();
@@ -116,10 +123,10 @@
             $('#gameCards').append(gameCardElem);
         });
 
-        $("#sendBtn").click((e) => {
-            let message = "Test message";
-            hubConnection.invoke("Test", message);
-        });
+        //$("#sendBtn").click((e) => {
+        //    let message = "Test message";
+        //    hubConnection.invoke("Test", message);
+        //});
 
         hubConnection.start();
     </script>
