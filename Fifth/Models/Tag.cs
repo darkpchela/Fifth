@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿#nullable disable
 
 namespace Fifth.Models
 {
-    public class Tag
+    public partial class Tag
     {
-        [Key]
         public int Id { get; set; }
-
         public string Text { get; set; }
     }
 }

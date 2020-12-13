@@ -1,13 +1,20 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+
+#nullable disable
 
 namespace Fifth.Models
 {
-    public class User
-    {   
-        [Key]
-        public int Id { get; set; }
+    public partial class User
+    {
+        public User()
+        {
+            GameSessions = new HashSet<GameSession>();
+        }
 
+        public int Id { get; set; }
         public string Login { get; set; }
+        public string Password { get; set; }
+
+        public virtual ICollection<GameSession> GameSessions { get; set; }
     }
 }

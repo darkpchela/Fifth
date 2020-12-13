@@ -30,7 +30,7 @@ namespace Fifth.Services
 
         public async Task<bool> EnterGameAsync(string connectionId, string userName, int gameId)
         {
-            var game = await dbContext.GameSessions.FirstOrDefaultAsync(s => s.SessionId == gameId);
+            var game = await dbContext.GameSessions.FirstOrDefaultAsync(s => s.Id == gameId);
             if (game is null || game.Started)
                 return false;
 
@@ -55,7 +55,7 @@ namespace Fifth.Services
             dbContext.GameSessions.Add(session);
             await dbContext.SaveChangesAsync();
             OnGameCreated(session);
-            return session.SessionId;
+            return session.Id;
         }
 
         private async void OnGameCreated(GameSession gameSession)
