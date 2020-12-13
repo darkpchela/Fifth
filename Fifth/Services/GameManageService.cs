@@ -79,12 +79,8 @@ namespace Fifth.Services
 
         private async void OnGameCreated(GameSession gameSession)
         {
-            var sessionVm = new GameSessionVM
-            {
-                Name = gameSession.Name,
-                UserName = (await dbContext.Users.FirstOrDefaultAsync(u => u.Id == gameSession.OwnerId)).Login
-            };
-            await hubContext.Clients.All.SendAsync("OnGameCreated", sessionVm);
+            var gameVM = mapper.Map<GameSessionVM>(gameSession);
+            await hubContext.Clients.All.SendAsync("OnGameCreated", gameVM);
         }
 
     }

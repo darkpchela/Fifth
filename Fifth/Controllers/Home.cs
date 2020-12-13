@@ -1,14 +1,9 @@
 ﻿using Fifth.Interfaces;
-using Fifth.Models;
 using Fifth.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Fifth.Controllers
@@ -47,7 +42,7 @@ namespace Fifth.Controllers
         public async Task<IActionResult> CreateGame(CreateGameVM createGameVM)
         {
             int id = await gameManageService.CreateGameAsync(createGameVM);
-            return RedirectToAction(nameof(Game), id);
+            return RedirectToAction(nameof(Game), new { id = id });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
