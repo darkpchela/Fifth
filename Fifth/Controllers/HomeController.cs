@@ -1,6 +1,7 @@
 ﻿using Fifth.Interfaces;
 using Fifth.Models;
 using Fifth.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,13 +15,13 @@ namespace Fifth.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IGameManageService gameManageService;
+        private readonly ICookieAuthenticationService authenticationService;
 
-        public HomeController(ILogger<HomeController> logger, IGameManageService gameManageService)
+        public HomeController(IGameManageService gameManageService, ICookieAuthenticationService authenticationService)
         {
-            _logger = logger;
             this.gameManageService = gameManageService;
+            this.authenticationService = authenticationService;
         }
 
         public IActionResult Index()
@@ -33,6 +34,7 @@ namespace Fifth.Controllers
             return View();
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult Game(int id)
         {
@@ -43,7 +45,12 @@ namespace Fifth.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateGame(GameSessionVM createGameVM)
         {
+            if (!User.Identity.IsAuthenticated && !await authenticationService.SignInAsync(createGameVM.UserName, "") && !await authenticationService.SignUpAsync(createGameVM.UserName, ""))
+                return RedirectToAction(nameof(Index));
+
             int id = await gameManageService.CreateGameAsync(createGameVM);
+            var res = User.Identity.IsAuthenticated;
+
             return RedirectToAction(nameof(Game), id);
         }
 

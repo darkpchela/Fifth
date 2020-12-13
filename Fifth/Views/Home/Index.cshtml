@@ -117,7 +117,14 @@
                         <h5>
                             <label for="name">Your name:</label>
                         </h5>
-                        <input type="text" asp-for="UserName" class="bg-dark text-warning w-75" />
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <input type="text" asp-for="UserName" class="bg-dark text-warning w-75" value="@User.Identity.Name" />
+                        }
+                        else
+                        {
+                            <input type="text" asp-for="UserName" class="bg-dark text-warning w-75" />
+                        }
                     </div>
                     <div class="text-center p-2">
                         <h5>

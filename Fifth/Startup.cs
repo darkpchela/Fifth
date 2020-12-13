@@ -22,11 +22,11 @@ namespace Fifth
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddHttpContextAccessor();
             services.AddSignalR();
             services.AddScoped<IGameManageService, GameManageService>();
             services.AddDbContext<FifthDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("Default")));
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Home"));
+            services.AddHttpContextAccessor();
             services.AddDistributedMemoryCache();
             services.AddSession();
             services.AddTransient<ICookieAuthenticationService, CookieAuthenticationService>();
@@ -50,6 +50,7 @@ namespace Fifth
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

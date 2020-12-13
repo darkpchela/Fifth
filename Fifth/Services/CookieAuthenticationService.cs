@@ -29,6 +29,7 @@ namespace Fifth.Services
                 Login = userName
             });
             await dbContext.SaveChangesAsync();
+            await Authenticate(user.Login);
             return true;
         }
 
