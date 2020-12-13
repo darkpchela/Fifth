@@ -15,9 +15,9 @@ namespace Fifth.Services
 
         private IHubContext<MainHub> hubContext;
 
-        private FifthDbContext dbContext;
+        private AppDbContext dbContext;
 
-        public GameManageService(IHubContext<MainHub> hubContext, FifthDbContext dbContext)
+        public GameManageService(IHubContext<MainHub> hubContext, AppDbContext dbContext)
         {
             this.hubContext = hubContext;
             this.dbContext = dbContext;

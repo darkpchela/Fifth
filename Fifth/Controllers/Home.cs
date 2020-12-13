@@ -16,9 +16,9 @@ namespace Fifth.Controllers
     public class Home : Controller
     {
         private readonly IGameManageService gameManageService;
-        private readonly ICookieAuthenticationService authenticationService;
+        private readonly IAppAuthenticationService authenticationService;
 
-        public Home(IGameManageService gameManageService, ICookieAuthenticationService authenticationService)
+        public Home(IGameManageService gameManageService, IAppAuthenticationService authenticationService)
         {
             this.gameManageService = gameManageService;
             this.authenticationService = authenticationService;

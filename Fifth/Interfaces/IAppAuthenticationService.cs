@@ -2,7 +2,7 @@
 
 namespace Fifth.Interfaces
 {
-    public interface ICookieAuthenticationService
+    public interface IAppAuthenticationService
     {
         Task<bool> SignInAsync(string username, string password);
 

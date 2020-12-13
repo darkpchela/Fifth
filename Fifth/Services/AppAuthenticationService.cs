@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace Fifth.Services
 {
-    public class CookieAuthenticationService : ICookieAuthenticationService
+    public class AppAuthenticationService : IAppAuthenticationService
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly FifthDbContext dbContext;
-        public CookieAuthenticationService(IHttpContextAccessor httpContextAccessor, FifthDbContext dbContext)
+        private readonly AppDbContext dbContext;
+        public AppAuthenticationService(IHttpContextAccessor httpContextAccessor, AppDbContext dbContext)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.dbContext = dbContext;

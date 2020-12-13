@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fifth.Services
 {
-    public partial class FifthDbContext : DbContext
+    public partial class AppDbContext : DbContext
     {
-        public FifthDbContext()
+        public AppDbContext()
         {
         }
 
-        public FifthDbContext(DbContextOptions<FifthDbContext> options)
+        public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
         }

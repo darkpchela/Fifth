@@ -24,12 +24,12 @@ namespace Fifth
             services.AddControllersWithViews();
             services.AddSignalR();
             services.AddScoped<IGameManageService, GameManageService>();
-            services.AddDbContext<FifthDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("Default")));
+            services.AddDbContext<AppDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("Default")));
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Home"));
             services.AddHttpContextAccessor();
             services.AddDistributedMemoryCache();
             services.AddSession();
-            services.AddTransient<ICookieAuthenticationService, CookieAuthenticationService>();
+            services.AddTransient<IAppAuthenticationService, AppAuthenticationService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

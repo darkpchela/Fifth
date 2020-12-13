@@ -7,9 +7,9 @@ namespace Fifth.Controllers
 {
     public class Account : Controller
     {
-        private readonly ICookieAuthenticationService authenticationService;
+        private readonly IAppAuthenticationService authenticationService;
 
-        public Account(ICookieAuthenticationService authenticationService)
+        public Account(IAppAuthenticationService authenticationService)
         {
             this.authenticationService = authenticationService;
         }
