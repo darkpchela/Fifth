@@ -7,10 +7,6 @@ if (input) {
     })
     tagify.settings.whitelist.splice(0, 2, 'a', 'b');
 }
-else {
-    console.log('tagifyInput not found');
-}
-
 $('#tagsCloud a, #tagsFilter a').click((e) => {
     e.preventDefault();
     let selected = $(e.target).attr('data-selected');
