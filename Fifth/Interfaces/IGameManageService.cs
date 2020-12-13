@@ -8,7 +8,7 @@ namespace Fifth.Interfaces
     {
         Task<int> CreateGameAsync(CreateGameVM createGameVM);
 
-        Task CloseGameAsync();
+        Task CloseGameAsync(int id);
 
         Task<bool> EnterGameAsync(string connectionId, string userName ,int gameId);
 

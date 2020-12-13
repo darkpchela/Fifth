@@ -17,28 +17,19 @@ namespace Fifth.Services
         }
         public async override Task OnConnectedAsync()
         {
-            string currentId = Context.ConnectionId;
-            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
-
-            //var res = await gameManageService.EnterGameAsync();
-            await Clients.All.SendAsync("Test", $"{Context.ConnectionId} connected to game");
-
-
-            await Groups.AddToGroupAsync(currentId, gameId.ToString());
+            var http = Context.GetHttpContext();
+            int gameId = http.Session.GetInt32("gameId").Value;
+            await Clients.All.SendAsync("Test", $"{http.User.Identity.Name} connected to game");
+            await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
             await base.OnConnectedAsync();
         }
 
-        private async Task<bool> TryEntryGame(string connectionId, int gameId)
+        public async override Task OnDisconnectedAsync(Exception exception)
         {
-            try
-            {
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
+            await gameManageService.CloseGameAsync(gameId);
+            await Clients.Group(gameId.ToString()).SendAsync("Test", $"{Context.GetHttpContext().User.Identity.Name} left game. Game #{gameId} closed.");
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }

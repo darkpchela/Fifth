@@ -30,9 +30,13 @@ namespace Fifth.Services
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public Task CloseGameAsync()
+        public async Task CloseGameAsync(int id)
         {
-            throw new NotImplementedException();
+            var gameSession = dbContext.GameSessions.Find(id);
+            if (gameSession is null)
+                return;
+            dbContext.GameSessions.Remove(gameSession);
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task<bool> EnterGameAsync(string connectionId, string userName, int gameId)
