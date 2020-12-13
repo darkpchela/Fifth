@@ -22,6 +22,8 @@ namespace Fifth.Services
 
         private readonly IHttpContextAccessor httpContextAccessor;
 
+        private readonly List<Game> gamesInstances = new List<Game>();
+
         public GameManageService(IHubContext<MainHub> hubContext, AppDbContext dbContext, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             this.hubContext = hubContext;
@@ -32,52 +34,44 @@ namespace Fifth.Services
 
         public async Task CloseGameAsync(int id)
         {
-            var gameSession = dbContext.GameSessions.Find(id);
+            var gameSession = dbContext.GameInfoDatas.Find(id);
             if (gameSession is null)
                 return;
-            dbContext.GameSessions.Remove(gameSession);
+            dbContext.GameInfoDatas.Remove(gameSession);
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<bool> EnterGameAsync(string connectionId, string userName, int gameId)
+        public async Task<bool> EnterGameAsync(string connectionId, string userName ,int gameId)
         {
-            var game = await dbContext.GameSessions.FirstOrDefaultAsync(s => s.Id == gameId);
-            if (game is null || game.Started)
-                return false;
 
-            var newPlayer = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == userName);
-            if (newPlayer is null)
-                return false;
-
-            game.OpponentId = newPlayer.Id;
-            game.Started = true;
             await dbContext.SaveChangesAsync();
             return true;
         }
 
         public async Task<int> CreateGameAsync(CreateGameVM createGameVM)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == httpContextAccessor.HttpContext.User.Identity.Name);
-            var session = new GameSession
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.Username);
+            var session = new GameInfoData
             {
-                OwnerId = user.Id,
-                Name = createGameVM.Name,
-                Owner = user
+                Creator = user,
+                Name =createGameVM.Name,
             };
-            dbContext.GameSessions.Add(session);
+            dbContext.GameInfoDatas.Add(session);
             await dbContext.SaveChangesAsync();
             OnGameCreated(session);
+            var game = new Game(session.Id.ToString());
+            gamesInstances.Add(game);
             return session.Id;
         }
 
         public async Task<IList<GameSessionVM>> GetAllSessionsAsync()
         {
-            var openedSessions = dbContext.GameSessions.Where(s => !s.Started).Include(t => t.Owner);
+            var openedSessions = dbContext.GameInfoDatas.Where(s => !s.Started).Include(t => t.Creator);
             var VMs = mapper.ProjectTo<GameSessionVM>(openedSessions);
             return await VMs.ToListAsync();
         }
 
-        private async void OnGameCreated(GameSession gameSession)
+        private async void OnGameCreated(GameInfoData gameSession)
         {
             var gameVM = mapper.Map<GameSessionVM>(gameSession);
             await hubContext.Clients.All.SendAsync("OnGameCreated", gameVM);

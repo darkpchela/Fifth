@@ -41,6 +41,7 @@ namespace Fifth.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateGame(CreateGameVM createGameVM)
         {
+            createGameVM.Username = HttpContext.User.Identity.Name;
             int id = await gameManageService.CreateGameAsync(createGameVM);
             return RedirectToAction(nameof(Game), new { id = id });
         }

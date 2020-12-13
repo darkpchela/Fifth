@@ -7,9 +7,9 @@ namespace Fifth.Etc
 
     public class GameSessionEventArgs : EventArgs
     {
-        public GameSession GameSession { get; }
+        public GameInfoData GameSession { get; }
 
-        public GameSessionEventArgs(GameSession gameSession)
+        public GameSessionEventArgs(GameInfoData gameSession)
         {
             GameSession = gameSession;
         }

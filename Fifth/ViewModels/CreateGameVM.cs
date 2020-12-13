@@ -10,5 +10,7 @@ namespace Fifth.ViewModels
         public string Name { get; set; }
 
         public IList<string> Tags { get; set; }
+
+        public string Username { get; set; }
     }
 }

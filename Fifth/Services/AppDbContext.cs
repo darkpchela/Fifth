@@ -16,7 +16,7 @@ namespace Fifth.Services
         {
         }
 
-        public virtual DbSet<GameSession> GameSessions { get; set; }
+        public virtual DbSet<GameInfoData> GameInfoDatas { get; set; }
         public virtual DbSet<SessionTag> SessionTags { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<User> Users { get; set; }
@@ -33,11 +33,11 @@ namespace Fifth.Services
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Cyrillic_General_CI_AS");
 
-            modelBuilder.Entity<GameSession>(entity =>
+            modelBuilder.Entity<GameInfoData>(entity =>
             {
-                entity.HasOne(d => d.Owner)
+                entity.HasOne(d => d.Creator)
                     .WithMany(p => p.GameSessions)
-                    .HasForeignKey(d => d.OwnerId)
+                    .HasForeignKey(d => d.CreatorId)
                     .HasConstraintName("FK_GameSessions_To_Users");
             });
 

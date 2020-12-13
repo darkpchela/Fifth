@@ -8,13 +8,13 @@ namespace Fifth.Models
     {
         public User()
         {
-            GameSessions = new HashSet<GameSession>();
+            GameSessions = new HashSet<GameInfoData>();
         }
 
         public int Id { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
 
-        public virtual ICollection<GameSession> GameSessions { get; set; }
+        public virtual ICollection<GameInfoData> GameSessions { get; set; }
     }
 }

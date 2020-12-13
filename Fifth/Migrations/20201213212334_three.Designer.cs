@@ -3,14 +3,16 @@ using Fifth.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Fifth.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201213212334_three")]
+    partial class three
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -19,7 +21,7 @@ namespace Fifth.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.1");
 
-            modelBuilder.Entity("Fifth.Models.GameInfoData", b =>
+            modelBuilder.Entity("Fifth.Models.GameInfo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,7 +41,7 @@ namespace Fifth.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("GameInfoDatas");
+                    b.ToTable("GameSessions");
                 });
 
             modelBuilder.Entity("Fifth.Models.SessionTag", b =>
@@ -100,7 +102,7 @@ namespace Fifth.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Fifth.Models.GameInfoData", b =>
+            modelBuilder.Entity("Fifth.Models.GameInfo", b =>
                 {
                     b.HasOne("Fifth.Models.User", "Creator")
                         .WithMany("GameSessions")
@@ -114,7 +116,7 @@ namespace Fifth.Migrations
 
             modelBuilder.Entity("Fifth.Models.SessionTag", b =>
                 {
-                    b.HasOne("Fifth.Models.GameInfoData", "Session")
+                    b.HasOne("Fifth.Models.GameInfo", "Session")
                         .WithMany()
                         .HasForeignKey("SessionId")
                         .HasConstraintName("FK_SessionTags_To_GameSessions")
