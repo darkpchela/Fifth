@@ -15,18 +15,15 @@ namespace Fifth.Services
         
         public async override Task OnConnectedAsync()
         {
-            await Clients.All.SendAsync("Test", new { 
-                Context.ConnectionId,
-                Context.User
-            });
+            await Clients.All.SendAsync("Test", $"{Context.ConnectionId} connected to mainHub");
 
             await base.OnConnectedAsync();
         }
 
-        //public async override Task OnDisconnectedAsync(Exception exception)
-        //{
-        //    await Clients.All.SendAsync("Test", $"{Context.ConnectionId} diconnected");
-        //    await base.OnDisconnectedAsync(exception);
-        //}
+        public async override Task OnDisconnectedAsync(Exception exception)
+        {
+            await Clients.All.SendAsync("Test", $"{Context.ConnectionId} diconnected");
+            await base.OnDisconnectedAsync(exception);
+        }
     }
 }

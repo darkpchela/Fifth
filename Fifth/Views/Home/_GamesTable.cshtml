@@ -1,4 +1,5 @@
-﻿@model IList<GameSessionVM>
+﻿@inject Fifth.Interfaces.IGameManageService gameManageService
+
 <div class="text-center">
     <h3 class="text-monospace text-warning">Games</h3>
 </div>
@@ -12,16 +13,16 @@
             </div>
         </div>
     </div>
-    @foreach (var g in Model)
+    @foreach (var g in  await gameManageService.GetAllSessionsAsync())
     {
-    <div class="p-2">
-        <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
-            <div class="card-body border rounded border-warning text-center">
-                <h5 class="card-title"> @g.Name</h5>
-                <span class="card-text">@g.UserName</span>
-                <a asp-action="Game"  asp-route-id="@g.Id" class="text-warning">Join</a>
+        <div class="p-2">
+            <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
+                <div class="card-body border rounded border-warning text-center">
+                    <h5 class="card-title"> @g.Name</h5>
+                    <span class="card-text">@g.UserName</span>
+                    <a asp-action="Game" asp-route-id="@g.Id" class="text-warning">Join</a>
+                </div>
             </div>
         </div>
-    </div>
     }
 </div>

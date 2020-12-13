@@ -23,7 +23,6 @@ namespace Fifth
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddSignalR();
             services.AddScoped<IGameManageService, GameManageService>();
             services.AddDbContext<AppDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("Default")));
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Home"));
@@ -32,6 +31,7 @@ namespace Fifth
             services.AddSession();
             services.AddTransient<IAppAuthenticationService, AppAuthenticationService>();
             services.AddAutomapperProfiles();
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

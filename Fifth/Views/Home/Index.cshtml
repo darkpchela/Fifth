@@ -1,7 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Main Page";
 }
-@inject Fifth.Interfaces.IGameManageService gameManageService
 @model GameSessionVM
 <div class="col-2 float-left">
     <div class="text-center">
@@ -25,7 +24,7 @@
 </div>
 
 <div class="col-8 offset-2">
-    @{ await Html.RenderPartialAsync("_GamesTable", await gameManageService.GetAllSessionsAsync());}
+    @{ await Html.RenderPartialAsync("_GamesTable");}
 </div>
 
 <div id="modal" class="modal" tabindex="-1">
@@ -83,10 +82,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <script src="~/js/index.js"></script>
     <script>
-        //$('#newGame').click((e) => {
-        //    e.preventDefault();
-        //    $('#modal').modal('show');
-        //})
+
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/MainHub")
             .build();
@@ -98,14 +94,9 @@
         hubConnection.on("OnGameCreated", data => {
             console.log(data);
             let gameCardElem = '<div class="p-2"><div class="card border rounded border-warning ml-1 mr-1 bg-secondary"><div class="card-body border rounded border-warning">' +
-                `<h5 class="card-title">${data.gameName}</h5><span class="d-block card-text">${data.userName}</span><a>Play</a></div></div></div>`;
+                `<h5 class="card-title">${data.name}</h5><span class="d-block card-text">${data.userName}</span><a>Play</a></div></div></div>`;
             $('#gameCards').append(gameCardElem);
         });
-
-        //$("#sendBtn").click((e) => {
-        //    let message = "Test message";
-        //    hubConnection.invoke("Test", message);
-        //});
 
         hubConnection.start();
     </script>
