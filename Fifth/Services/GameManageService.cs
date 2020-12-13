@@ -34,17 +34,25 @@ namespace Fifth.Services
 
         public async Task CloseGameAsync(int id)
         {
-            var gameSession = dbContext.GameInfoDatas.Find(id);
-            if (gameSession is null)
-                return;
-            dbContext.GameInfoDatas.Remove(gameSession);
+            var gameData = dbContext.GameInfoDatas.Find(id);
+            var game = gamesInstances.FirstOrDefault(g => g.Id == id.ToString());
+            if (gameData != null)
+                dbContext.GameInfoDatas.Remove(gameData);
+            if (game != null)
+                gamesInstances.Remove(game);
             await dbContext.SaveChangesAsync();
         }
 
         public async Task<bool> EnterGameAsync(string connectionId, string userName ,int gameId)
         {
+            var game = gamesInstances.FirstOrDefault(g => g.Id == gameId.ToString());
+            if (game is null || game.PlayersCount >= 2)
+                return false;
 
-            await dbContext.SaveChangesAsync();
+            game.RegistPlayer(connectionId);
+            if (game.PlayersCount == 2)
+                SetStarted(gameId);
+
             return true;
         }
 
@@ -64,7 +72,7 @@ namespace Fifth.Services
             return session.Id;
         }
 
-        public async Task<IList<GameSessionVM>> GetAllSessionsAsync()
+        public async Task<IList<GameSessionVM>> GetAllGameDatasAsync()
         {
             var openedSessions = dbContext.GameInfoDatas.Where(s => !s.Started).Include(t => t.Creator);
             var VMs = mapper.ProjectTo<GameSessionVM>(openedSessions);
@@ -77,5 +85,13 @@ namespace Fifth.Services
             await hubContext.Clients.All.SendAsync("OnGameCreated", gameVM);
         }
 
+        private async void SetStarted(int gameId)
+        {
+            var gameData = await dbContext.GameInfoDatas.FirstOrDefaultAsync(d => d.Id == gameId);
+            if (gameData is null)
+                return;
+            gameData.Started = true;
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

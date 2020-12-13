@@ -13,9 +13,11 @@ namespace Fifth.Models
 
         private int[] map = new int[9];
 
+        private List<string> players = new List<string>();
+
         public string Id { get; }
 
-        public string[] Players { get; }
+        public int PlayersCount { get; } = 0;
 
         public string CurrentPlayer { get; private set; }
 
@@ -35,7 +37,13 @@ namespace Fifth.Models
 
         public string CalcResult()
         {
-            return Players[0];
+            return "Not implemted";
+        }
+
+        public void RegistPlayer(string connectionId)
+        {
+            if(PlayersCount < 2)
+            players.Add(connectionId);
         }
 
         private void SwapMoveValue()

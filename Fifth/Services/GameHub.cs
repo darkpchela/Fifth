@@ -19,7 +19,9 @@ namespace Fifth.Services
         {
             var http = Context.GetHttpContext();
             int gameId = http.Session.GetInt32("gameId").Value;
-            await Clients.All.SendAsync("Test", $"{http.User.Identity.Name} connected to game");
+            await Clients.All.SendAsync("Test", $"{http.User.Identity.Name} connected to hub");
+            await Clients.All.SendAsync("Test", $"{Context.ConnectionId} connected to hub");
+            await TryEnterGame();
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
             await base.OnConnectedAsync();
         }
@@ -30,6 +32,13 @@ namespace Fifth.Services
             await gameManageService.CloseGameAsync(gameId);
             await Clients.Group(gameId.ToString()).SendAsync("Test", $"{Context.GetHttpContext().User.Identity.Name} left game. Game #{gameId} closed.");
             await base.OnDisconnectedAsync(exception);
+        }
+
+        private async Task TryEnterGame()
+        {
+            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
+            var res = await gameManageService.EnterGameAsync(Context.ConnectionId, "", gameId);
+            await Clients.Group(gameId.ToString()).SendAsync("Test", $"{res}");
         }
     }
 }
