@@ -53,7 +53,7 @@ namespace Fifth.Services
             var session = new GameSession
             {
                 OwnerId = user.Id,
-                SessionName = createGameVM.GameName
+                Name = createGameVM.GameName
             };
             dbContext.GameSessions.Add(session);
             await dbContext.SaveChangesAsync();
@@ -63,7 +63,7 @@ namespace Fifth.Services
 
         public async Task<IList<GameSessionVM>> GetAllSessions()
         {
-            var openedSessions = dbContext.GameSessions.Where(s => !s.Started);
+            var openedSessions = dbContext.GameSessions.Where(s => !s.Started).Include(t => t.Owner);
             var VMs = mapper.ProjectTo<GameSessionVM>(openedSessions);
             return await VMs.ToListAsync();
         }
@@ -72,7 +72,7 @@ namespace Fifth.Services
         {
             var sessionVm = new GameSessionVM
             {
-                GameName = gameSession.SessionName,
+                Name = gameSession.Name,
                 UserName = (await dbContext.Users.FirstOrDefaultAsync(u => u.Id == gameSession.OwnerId)).Login
             };
             await hubContext.Clients.All.SendAsync("OnGameCreated", sessionVm);

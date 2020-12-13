@@ -42,15 +42,11 @@ namespace Fifth.Controllers
             return View();
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateGame(CreateGameVM createGameVM)
         {
-            if (!User.Identity.IsAuthenticated && !await authenticationService.SignInAsync(createGameVM.UserName, "") && !await authenticationService.SignUpAsync(createGameVM.UserName, ""))
-                return RedirectToAction(nameof(Index));
-
             int id = await gameManageService.CreateGameAsync(createGameVM);
-            var res = User.Identity.IsAuthenticated;
-
             return RedirectToAction(nameof(Game), id);
         }
 
