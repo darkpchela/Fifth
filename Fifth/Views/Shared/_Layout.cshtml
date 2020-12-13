@@ -17,7 +17,7 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-warning" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
@@ -25,6 +25,28 @@
                         <li class="nav-item">
                             <a class="nav-link text-warning" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                    </ul>
+                    <ul class="navbar-nav text-warning flex-grow-0">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <div class="bg-secondary h-100 p-1 align-content-center rounded">
+                                    @User.Identity.Name
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-action="SignOut" asp-controller="Account" class="nav-link text-warning">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a asp-action="SignUp" asp-controller="Account" class="nav-link text-warning">Sign Up </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-action="SignIn" asp-controller="Account" class="nav-link text-warning">Sign In </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

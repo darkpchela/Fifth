@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace Fifth.Controllers
 {
-    public class HomeController : Controller
+    public class Home : Controller
     {
         private readonly IGameManageService gameManageService;
         private readonly ICookieAuthenticationService authenticationService;
 
-        public HomeController(IGameManageService gameManageService, ICookieAuthenticationService authenticationService)
+        public Home(IGameManageService gameManageService, ICookieAuthenticationService authenticationService)
         {
             this.gameManageService = gameManageService;
             this.authenticationService = authenticationService;

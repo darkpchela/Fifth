@@ -1,0 +1,28 @@
+﻿@model UserSignInVM
+
+<div class="col-4 offset-4 text-monospace text-warning bg-secondary border border-warning rounded">
+    <form class="form-horizontal col-10 offset-1 p-1 text-center" asp-controller="Account" asp-action="SignIn" method="POST">
+        <div class="control-group mt-3">
+            <label class="control-label" for="email">Login:</label>
+            <div class="controls">
+                <input type="text" asp-for="Login" class="bg-dark form-control text-warning">
+            </div>
+        </div>
+
+        <div class="control-group mt-3">
+            <label class="control-label" for="password">Password:</label>
+            <div class="controls">
+                <input type="password" asp-for="Password" placeholder="" class="bg-dark form-control text-warning">
+            </div>
+        </div>
+
+        <div class="control-group mt-3">
+            <div class="controls">
+                <button class="btn btn-dark text-warning">Sign In</button>
+            </div>
+        </div>
+
+        <div asp-validation-summary="All" class="w-100 text-danger mt-4">
+        </div>
+    </form>
+</div>

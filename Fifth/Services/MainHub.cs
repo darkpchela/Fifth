@@ -22,5 +22,11 @@ namespace Fifth.Services
 
             await base.OnConnectedAsync();
         }
+
+        //public async override Task OnDisconnectedAsync(Exception exception)
+        //{
+        //    await Clients.All.SendAsync("Test", $"{Context.ConnectionId} diconnected");
+        //    await base.OnDisconnectedAsync(exception);
+        //}
     }
 }

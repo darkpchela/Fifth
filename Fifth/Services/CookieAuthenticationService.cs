@@ -21,13 +21,15 @@ namespace Fifth.Services
         }
         public async Task<bool> SignUpAsync(string userName, string password)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == userName);
-            if (user != null)
+            if (await dbContext.Users.AnyAsync(u => u.Login == userName))
                 return false;
-            await dbContext.Users.AddAsync(new User
+
+            var user = new User
             {
-                Login = userName
-            });
+                Login = userName,
+                Password = password
+            };
+            await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
             await Authenticate(user.Login);
             return true;
@@ -35,7 +37,7 @@ namespace Fifth.Services
 
         public async Task<bool> SignInAsync(string userName, string password)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == userName);
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == userName && u.Password == password);
             if (user is null)
                 return false;
             await Authenticate(user.Login);
