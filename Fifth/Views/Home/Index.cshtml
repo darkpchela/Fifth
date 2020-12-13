@@ -1,6 +1,7 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Main Page";
 }
+@inject Fifth.Interfaces.IGameManageService gameManageService
 @model GameSessionVM
 <div class="col-2 float-left">
     <div class="text-center">
@@ -24,29 +25,7 @@
 </div>
 
 <div class="col-8 offset-2">
-    <div class="text-center">
-        <h3 class="text-monospace text-warning">Games</h3>
-    </div>
-    <div id="gameCards" class="d-flex flex-row flex-wrap bg-dark justify-content-around p-3 border border-warning rounded">
-        <div class="p-2">
-            <div class="ml-1 mr-1 bg-success">
-                <div class="card-body border rounded border-warning text-center">
-                    <h5 class="card-title">Your game</h5>
-                    <span class="card-text"></span>
-                    <a id="newGame" class="text-warning">Create</a>
-                </div>
-            </div>
-        </div>
-        <div class="p-2">
-            <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
-                <div class="card-body border rounded border-warning text-center">
-                    <h5 class="card-title">First game</h5>
-                    <span class="card-text"></span>
-                    <a asp-action="Game" class="text-warning">Join</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    @{ await Html.RenderPartialAsync("_GamesTable", await gameManageService.GetAllSessions());}
 </div>
 
 <div id="modal" class="modal" tabindex="-1">

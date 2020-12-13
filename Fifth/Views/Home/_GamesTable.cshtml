@@ -1,0 +1,27 @@
+﻿@model IList<GameSessionVM>
+<div class="text-center">
+    <h3 class="text-monospace text-warning">Games</h3>
+</div>
+<div id="gameCards" class="d-flex flex-row flex-wrap bg-dark justify-content-around p-3 border border-warning rounded">
+    <div class="p-2">
+        <div class="ml-1 mr-1 bg-success">
+            <div class="card-body border rounded border-warning text-center">
+                <h5 class="card-title">Your game</h5>
+                <span class="card-text"></span>
+                <a id="newGame" class="text-warning">Create</a>
+            </div>
+        </div>
+    </div>
+    @foreach (var g in Model)
+    {
+    <div class="p-2">
+        <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
+            <div class="card-body border rounded border-warning text-center">
+                <h5 class="card-title">First game</h5>
+                <span class="card-text"></span>
+                <a asp-action="Game"  asp-route-id="@g.Id" class="text-warning">Join</a>
+            </div>
+        </div>
+    </div>
+    }
+</div>

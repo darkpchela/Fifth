@@ -43,7 +43,7 @@ namespace Fifth.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGame(GameSessionVM createGameVM)
+        public async Task<IActionResult> CreateGame(CreateGameVM createGameVM)
         {
             if (!User.Identity.IsAuthenticated && !await authenticationService.SignInAsync(createGameVM.UserName, "") && !await authenticationService.SignUpAsync(createGameVM.UserName, ""))
                 return RedirectToAction(nameof(Index));

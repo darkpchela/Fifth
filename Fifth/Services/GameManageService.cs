@@ -47,7 +47,7 @@ namespace Fifth.Services
             return true;
         }
 
-        public async Task<int> CreateGameAsync(GameSessionVM createGameVM)
+        public async Task<int> CreateGameAsync(CreateGameVM createGameVM)
         {
             var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.UserName);
             var session = new GameSession
