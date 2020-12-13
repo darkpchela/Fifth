@@ -1,9 +1,15 @@
-﻿let input = document.querySelector('#tagsInput');
-let tagify = new Tagify(input, {
-    whitelist: [],
-    maxTags: 10
-})
-tagify.settings.whitelist.splice(0, 2, 'a', 'b');
+﻿let tagify;
+let input = document.querySelector('#tagsInput');
+if (input) {
+    tagify = new Tagify(input, {
+        whitelist: [],
+        maxTags: 10
+    })
+    tagify.settings.whitelist.splice(0, 2, 'a', 'b');
+}
+else {
+    console.log('tagifyInput not found');
+}
 
 $('#tagsCloud a, #tagsFilter a').click((e) => {
     e.preventDefault();
