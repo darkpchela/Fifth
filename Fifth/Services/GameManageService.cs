@@ -1,26 +1,29 @@
-﻿using Fifth.Interfaces;
+﻿using AutoMapper;
+using Fifth.Interfaces;
 using Fifth.Models;
 using Fifth.ViewModels;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Fifth.Services
 {
     public class GameManageService : IGameManageService
     {
-        private List<GameSession> gameSessions = new List<GameSession>();
+        private readonly IHubContext<MainHub> hubContext;
 
-        private IHubContext<MainHub> hubContext;
+        private readonly AppDbContext dbContext;
 
-        private AppDbContext dbContext;
+        private readonly IMapper mapper;
 
-        public GameManageService(IHubContext<MainHub> hubContext, AppDbContext dbContext)
+        public GameManageService(IHubContext<MainHub> hubContext, AppDbContext dbContext, IMapper mapper)
         {
             this.hubContext = hubContext;
             this.dbContext = dbContext;
+            this.mapper = mapper;
         }
 
         public Task CloseGameAsync()
@@ -46,7 +49,7 @@ namespace Fifth.Services
 
         public async Task<int> CreateGameAsync(GameSessionVM createGameVM)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.UserName) ?? await CreateNewUser(createGameVM);
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.UserName);
             var session = new GameSession
             {
                 OwnerId = user.Id,
@@ -56,6 +59,13 @@ namespace Fifth.Services
             await dbContext.SaveChangesAsync();
             OnGameCreated(session);
             return session.Id;
+        }
+
+        public async Task<IList<GameSessionVM>> GetAllSessions()
+        {
+            var openedSessions = dbContext.GameSessions.Where(s => !s.Started);
+            var VMs = mapper.ProjectTo<GameSessionVM>(openedSessions);
+            return await VMs.ToListAsync();
         }
 
         private async void OnGameCreated(GameSession gameSession)
@@ -68,21 +78,5 @@ namespace Fifth.Services
             await hubContext.Clients.All.SendAsync("OnGameCreated", sessionVm);
         }
 
-        private async Task<User> CreateNewUser(GameSessionVM gameSessionVM)
-        {
-            var user = new User
-            {
-                Login = gameSessionVM.UserName
-            };
-            dbContext.Users.Add(user);
-            await dbContext.SaveChangesAsync();
-            return user;
-        }
-
-        //private async IEnumerable<Tag> MapTags(IEnumerable<string> tags)
-        //{
-        //    var allTags = await dbContext.Tags.ToListAsync();
-
-        //}
     }
 }

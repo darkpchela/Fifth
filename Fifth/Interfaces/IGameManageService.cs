@@ -1,4 +1,5 @@
 ﻿using Fifth.ViewModels;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Fifth.Interfaces
@@ -10,5 +11,7 @@ namespace Fifth.Interfaces
         Task CloseGameAsync();
 
         Task<bool> EnterGameAsync(string connectionId, string userName ,int gameId);
+
+        Task<IList<GameSessionVM>> GetAllSessions();
     }
 }

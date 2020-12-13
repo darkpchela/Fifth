@@ -1,3 +1,4 @@
+using Fifth.Extensions;
 using Fifth.Interfaces;
 using Fifth.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -30,6 +31,7 @@ namespace Fifth
             services.AddDistributedMemoryCache();
             services.AddSession();
             services.AddTransient<IAppAuthenticationService, AppAuthenticationService>();
+            services.AddAutomapperProfiles();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -58,6 +60,7 @@ namespace Fifth
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapFallbackToController("Index", "Home");
                 endpoints.MapHub<MainHub>("/MainHub");
                 endpoints.MapHub<GameHub>("/GameHub");
             });
