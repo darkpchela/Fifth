@@ -57,7 +57,8 @@ namespace Fifth.Services
             var session = new GameSession
             {
                 OwnerId = user.Id,
-                Name = createGameVM.GameName
+                Name = createGameVM.Name,
+                Owner = user
             };
             dbContext.GameSessions.Add(session);
             await dbContext.SaveChangesAsync();
