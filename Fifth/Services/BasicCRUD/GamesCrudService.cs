@@ -1,11 +1,7 @@
-﻿using AutoMapper;
-using Fifth.Interfaces;
+﻿using Fifth.Interfaces;
 using Fifth.Models;
-using Fifth.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Fifth.Services
@@ -14,31 +10,24 @@ namespace Fifth.Services
     {
         private readonly IUnitOfWork unitOfWork;
 
-        private readonly IMapper mapper;
-
-        public GamesCrudService(IUnitOfWork unitOfWork, IMapper mapper)
+        public GamesCrudService(IUnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
-            this.mapper = mapper;
         }
 
-        public async Task CreateAsync(CreateGameVM createGameVM)
+        public async Task<int> CreateAsync(string gameName, User userCreator)
         {
-            var user = await  unitOfWork.DbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.Username);
-            var gameData = new GameData
-            {
-                Creator = user,
-                Name = createGameVM.Name
-            };
+            GameData gameData = new GameData(gameName, userCreator);
             unitOfWork.DbContext.GameInfoDatas.Add(gameData);
             await unitOfWork.DbContext.SaveChangesAsync();
-            var game = new GameInstance(gameData.Id.ToString());
-            await unitOfWork.GamesStore.Create(game);
+            Game game = new Game(gameData);
+            await unitOfWork.GamesStore.Create(game.GameInstance);
+            return game.GameData.Id;
         }
 
         public async Task DeleteAsync(int gameId)
         {
-            var gameData = await unitOfWork.DbContext.GameInfoDatas.FirstOrDefaultAsync(d=>d.Id == gameId);
+            var gameData = await unitOfWork.DbContext.GameInfoDatas.FirstOrDefaultAsync(d => d.Id == gameId);
             await unitOfWork.GamesStore.Delete(gameId);
             if (gameData is null)
                 return;
@@ -46,28 +35,29 @@ namespace Fifth.Services
             await unitOfWork.DbContext.SaveChangesAsync();
         }
 
-        public async Task<GameInstance> GetInstance(int id)
+        public async Task<Game> GetGameAsync(int id)
         {
-            var game = await unitOfWork.GamesStore.Get(id);
+            var gameData = await unitOfWork.DbContext.GameInfoDatas.FindAsync(id);
+            var gameInstance = await unitOfWork.GamesStore.Get(id);
+            var game = new Game(gameData, gameInstance);
             return game;
         }
 
-        public async Task<GameData> GetDataAsync(int id)
+        public async Task<IEnumerable<Game>> GetAllGamesAsync()
         {
-            var data = await unitOfWork.DbContext.GameInfoDatas.FirstOrDefaultAsync(d => d.Id == id);
-            return data;
+            var games = new List<Game>();
+            foreach (var gd in unitOfWork.DbContext.GameInfoDatas)
+            {
+                var gi = await GetGameInstance(gd.Id);
+                games.Add(new Game(gd, gi));
+            }
+            return games;
         }
 
-        public async Task<IEnumerable<GameInstance>> GetAllInstances()
+        private async Task<GameInstance> GetGameInstance(int id)
         {
-            var instnaces = await unitOfWork.GamesStore.GetAll();
-            return instnaces;
+            var gameInstance = await unitOfWork.GamesStore.Get(id);
+            return gameInstance;
         }
-
-        public async Task<IEnumerable<GameData>> GetAllDatasAsync()
-        {
-            return await unitOfWork.DbContext.GameInfoDatas.Include(t => t.Creator).ToListAsync();
-        }
-
     }
 }

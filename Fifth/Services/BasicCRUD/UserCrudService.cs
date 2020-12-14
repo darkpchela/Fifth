@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Fifth.Services.BasicCRUD
 {
-    public class UserService
+    public class UserCrudService : IUserCrudService
     {
         private readonly IUnitOfWork unitOfWork;
 
         private readonly IMapper mapper;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
+        public UserCrudService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
@@ -35,7 +35,7 @@ namespace Fifth.Services.BasicCRUD
 
         public async Task<IEnumerable<User>> GetAll()
         {
-            return unitOfWork.DbContext.Users;
+            return await unitOfWork.DbContext.Users.ToListAsync();
         }
     }
 }

@@ -21,8 +21,8 @@ namespace Fifth.Services
             int gameId = http.Session.GetInt32("gameId").Value;
             await Clients.All.SendAsync("Test", $"{http.User.Identity.Name} connected to hub");
             await Clients.All.SendAsync("Test", $"{Context.ConnectionId} connected to hub");
-            await TryEnterGame();
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
+            await TryEnterGame();
             await base.OnConnectedAsync();
         }
 

@@ -1,6 +1,7 @@
 using Fifth.Extensions;
 using Fifth.Interfaces;
 using Fifth.Services;
+using Fifth.Services.BasicCRUD;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,6 +35,7 @@ namespace Fifth
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutomapperProfiles();
             services.AddScoped<IGamesCrudService, GamesCrudService>();
+            services.AddScoped<IUserCrudService, UserCrudService>();
             services.AddSignalR();
         }
 

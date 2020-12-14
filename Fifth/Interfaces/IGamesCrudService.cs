@@ -1,5 +1,4 @@
 ﻿using Fifth.Models;
-using Fifth.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,16 +6,12 @@ namespace Fifth.Interfaces
 {
     public interface IGamesCrudService
     {
-        Task CreateAsync(CreateGameVM createModel);
+        Task<int> CreateAsync(string gameName, User userCreator);
 
         Task DeleteAsync(int id);
 
-        Task<GameInstance> GetInstance(int id);
+        Task<Game> GetGameAsync(int id);
 
-        Task<IEnumerable<GameInstance>> GetAllInstances();
-
-        Task<GameData> GetDataAsync(int id);
-
-        Task<IEnumerable<GameData>> GetAllDatasAsync();
+        Task<IEnumerable<Game>> GetAllGamesAsync();
     }
 }

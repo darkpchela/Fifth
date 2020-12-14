@@ -13,5 +13,15 @@ namespace Fifth.Models
         public bool Started { get; set; }
 
         public virtual User Creator { get; set; }
+
+        public GameData()
+        {
+        }
+
+        public GameData(string gameName, User userCreator)
+        {
+            Creator = userCreator;
+            Name = gameName;
+        }
     }
 }

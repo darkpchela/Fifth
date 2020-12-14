@@ -1,4 +1,4 @@
-﻿@inject Fifth.Interfaces.IGamesCrudService gameService
+﻿@inject Fifth.Interfaces.IGameProccessManager gameService
 
 <div class="text-center">
     <h3 class="text-monospace text-warning">Games</h3>
@@ -13,13 +13,13 @@
             </div>
         </div>
     </div>
-    @foreach (var g in  await gameService.GetAllDatasAsync())
+    @foreach (var g in  await gameService.GetOpenedGamesAsync())
     {
         <div class="p-2">
             <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
                 <div class="card-body border rounded border-warning text-center">
                     <h5 class="card-title"> @g.Name</h5>
-                    <h6 class="card-text">@g.Creator.Login</h6>
+                    <h6 class="card-text">@g.UserName</h6>
                     <a asp-action="Game" asp-route-id="@g.Id" class="text-warning">Join</a>
                 </div>
             </div>

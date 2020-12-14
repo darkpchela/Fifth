@@ -14,84 +14,58 @@ namespace Fifth.Services
 {
     public class GameProccessManager : IGameProccessManager
     {
-        private readonly AppDbContext dbContext;
-        
+
+        private readonly IUnitOfWork unitOfWork;
+
+        private readonly IGamesCrudService gamesCrudService;
+
         private readonly IHubContext<MainHub> hubContext;
+
+        private readonly IUserCrudService userCrudService;
 
         private readonly IMapper mapper;
 
-        private readonly IHttpContextAccessor httpContextAccessor;
 
-        private readonly List<GameInstance> gamesInstances = new List<GameInstance>();
-
-        public GameProccessManager(IHubContext<MainHub> hubContext, AppDbContext dbContext, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public GameProccessManager(IHubContext<MainHub> hubContext, IMapper mapper, IGamesCrudService gamesCrudService, IUnitOfWork unitOfWork, IUserCrudService userCrudService)
         {
             this.hubContext = hubContext;
-            this.dbContext = dbContext;
+            this.unitOfWork = unitOfWork;
             this.mapper = mapper;
-            this.httpContextAccessor = httpContextAccessor;
+            this.gamesCrudService = gamesCrudService;
+            this.userCrudService = userCrudService;
         }
 
         public async Task CloseGameAsync(int id)
         {
-            var gameData = dbContext.GameInfoDatas.Find(id);
-            var game = gamesInstances.FirstOrDefault(g => g.Id == id.ToString());
-            if (gameData != null)
-                dbContext.GameInfoDatas.Remove(gameData);
-            if (game != null)
-                gamesInstances.Remove(game);
-            await dbContext.SaveChangesAsync();
+            await gamesCrudService.DeleteAsync(id);
         }
 
         public async Task<bool> EnterGameAsync(string connectionId, string userName ,int gameId)
         {
-            var game = gamesInstances.FirstOrDefault(g => g.Id == gameId.ToString());
-            if (game is null || game.PlayersCount >= 2)
-                return false;
-
-            game.RegistPlayer(connectionId);
-            if (game.PlayersCount == 2)
-                SetStarted(gameId);
 
             return true;
         }
 
         public async Task<int> CreateGameAsync(CreateGameVM createGameVM)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.Username);
-            var session = new GameData
-            {
-                Creator = user,
-                Name =createGameVM.Name,
-            };
-            dbContext.GameInfoDatas.Add(session);
-            await dbContext.SaveChangesAsync();
-            OnGameCreated(session);
-            var game = new GameInstance(session.Id.ToString());
-            gamesInstances.Add(game);
-            return session.Id;
+            var user = await userCrudService.GetByLoginAsync(createGameVM.Username);
+            var gameId = await gamesCrudService.CreateAsync(createGameVM.Name, user);
+
+            return gameId;
         }
 
-        public async Task<IList<GameSessionVM>> GetAllGameDatasAsync()
+        public async Task<IList<GameSessionVM>> GetOpenedGamesAsync()
         {
-            var openedSessions = dbContext.GameInfoDatas.Where(s => !s.Started).Include(t => t.Creator);
+            var openedSessions = unitOfWork.DbContext.GameInfoDatas.Where(g => !g.Started).Include(t => t.Creator);
             var VMs = mapper.ProjectTo<GameSessionVM>(openedSessions);
             return await VMs.ToListAsync();
         }
 
-        private async void OnGameCreated(GameData gameSession)
+        private async void OnGameCreated(int gameId)
         {
-            var gameVM = mapper.Map<GameSessionVM>(gameSession);
-            await hubContext.Clients.All.SendAsync("OnGameCreated", gameVM);
+            var gameVM = await gamesCrudService.GetGameAsync(gameId);
+            await hubContext.Clients.All.SendAsync("OnGameCreated", gameVM.GameInstance);
         }
 
-        private async void SetStarted(int gameId)
-        {
-            var gameData = await dbContext.GameInfoDatas.FirstOrDefaultAsync(d => d.Id == gameId);
-            if (gameData is null)
-                return;
-            gameData.Started = true;
-            await dbContext.SaveChangesAsync();
-        }
     }
 }
