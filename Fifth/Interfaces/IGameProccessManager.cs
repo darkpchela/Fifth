@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Fifth.Interfaces
 {
-    public interface IGameManageService
+    public interface IGameProccessManager
     {
         Task<int> CreateGameAsync(CreateGameVM createGameVM);
 

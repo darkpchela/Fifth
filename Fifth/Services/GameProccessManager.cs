@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Fifth.Services
 {
-    public class GameManageService : IGameManageService
+    public class GameProccessManager : IGameProccessManager
     {
         private readonly AppDbContext dbContext;
         
@@ -22,9 +22,9 @@ namespace Fifth.Services
 
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        private readonly List<Game> gamesInstances = new List<Game>();
+        private readonly List<GameInstance> gamesInstances = new List<GameInstance>();
 
-        public GameManageService(IHubContext<MainHub> hubContext, AppDbContext dbContext, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public GameProccessManager(IHubContext<MainHub> hubContext, AppDbContext dbContext, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             this.hubContext = hubContext;
             this.dbContext = dbContext;
@@ -59,7 +59,7 @@ namespace Fifth.Services
         public async Task<int> CreateGameAsync(CreateGameVM createGameVM)
         {
             var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Login == createGameVM.Username);
-            var session = new GameInfoData
+            var session = new GameData
             {
                 Creator = user,
                 Name =createGameVM.Name,
@@ -67,7 +67,7 @@ namespace Fifth.Services
             dbContext.GameInfoDatas.Add(session);
             await dbContext.SaveChangesAsync();
             OnGameCreated(session);
-            var game = new Game(session.Id.ToString());
+            var game = new GameInstance(session.Id.ToString());
             gamesInstances.Add(game);
             return session.Id;
         }
@@ -79,7 +79,7 @@ namespace Fifth.Services
             return await VMs.ToListAsync();
         }
 
-        private async void OnGameCreated(GameInfoData gameSession)
+        private async void OnGameCreated(GameData gameSession)
         {
             var gameVM = mapper.Map<GameSessionVM>(gameSession);
             await hubContext.Clients.All.SendAsync("OnGameCreated", gameVM);

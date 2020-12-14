@@ -7,6 +7,6 @@ namespace Fifth.Models
         public int SessionId { get; set; }
         public int TagId { get; set; }
 
-        public virtual GameInfoData Session { get; set; }
+        public virtual GameData Session { get; set; }
     }
 }

@@ -23,14 +23,17 @@ namespace Fifth
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddScoped<IGameManageService, GameManageService>();
+            services.AddScoped<IGameProccessManager, GameProccessManager>();
             services.AddDbContext<AppDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("Default")));
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Home"));
             services.AddHttpContextAccessor();
             services.AddDistributedMemoryCache();
             services.AddSession();
             services.AddTransient<IAppAuthenticationService, AppAuthenticationService>();
+            services.AddSingleton<IGameInstanceRepository, GameInstanceRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutomapperProfiles();
+            services.AddScoped<IGamesCrudService, GamesCrudService>();
             services.AddSignalR();
         }
 

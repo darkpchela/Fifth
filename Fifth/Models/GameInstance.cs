@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Fifth.Models
 {
-    public class Game
+    public class GameInstance
     {
         private int moveValue = -1;
 
@@ -21,7 +21,7 @@ namespace Fifth.Models
 
         public string CurrentPlayer { get; private set; }
 
-        public Game(string id)
+        public GameInstance(string id)
         {
             this.Id = id;
         }

@@ -8,7 +8,7 @@ namespace Fifth.MappingProfiles
     {
         public GameSessionProfle()
         {
-            CreateMap<GameInfoData, GameSessionVM>().ForMember(vm => vm.UserName, opt => opt.MapFrom(m=>m.Creator.Login));
+            CreateMap<GameData, GameSessionVM>().ForMember(vm => vm.UserName, opt => opt.MapFrom(m=>m.Creator.Login));
         }
     }
 }
