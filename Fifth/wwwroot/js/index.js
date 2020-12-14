@@ -26,15 +26,5 @@ $('#newGame').click((e) => {
     $('#modal').modal('show');
 })
 
-function addCard(data) {
-    let cardElem = $('#cardPrototype').clone();
-    cardElem.removeAttr('id');
-    cardElem.attr("data-id", data.id)
-    $(cardElem).find('[name="game"]').text(data.name);
-    $(cardElem).find('[name="user"]').text(data.userName);
-    $(cardElem).find('[name="ref"]').prop('href', `/Home/Game/${data.id}`)
-    cardElem.prop('hidden', false);
-    $('#gameCards').append(cardElem);
-};
 
 

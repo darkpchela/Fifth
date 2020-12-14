@@ -25,6 +25,12 @@ namespace Fifth.Services
             return game.GameData.Id;
         }
 
+        public async Task UpdateAsync(Game game)
+        {
+            unitOfWork.DbContext.Entry(game.GameData).State = EntityState.Modified;
+            await unitOfWork.DbContext.SaveChangesAsync();
+        }
+
         public async Task DeleteAsync(int gameId)
         {
             var gameData = await unitOfWork.DbContext.GameInfoDatas.FirstOrDefaultAsync(d => d.Id == gameId);

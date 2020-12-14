@@ -10,8 +10,10 @@ namespace Fifth.Interfaces
 
         Task CloseGameAsync(int id);
 
-        Task<bool> EnterGameAsync(string connectionId, int gameId);
+        Task<bool> TryEnterGameAsync(string connectionId, int gameId);
 
         Task<IList<GameSessionVM>> GetOpenedGamesAsync();
+
+        Task<bool> TryStartGame(int gameId);
     }
 }

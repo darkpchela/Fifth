@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
 using Fifth.Interfaces;
-using Fifth.Models;
 using Fifth.ViewModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +11,6 @@ namespace Fifth.Services
 {
     public class GameProccessManager : IGameProccessManager
     {
-
         private readonly IUnitOfWork unitOfWork;
 
         private readonly IGamesCrudService gamesCrudService;
@@ -24,7 +20,6 @@ namespace Fifth.Services
         private readonly IUserCrudService userCrudService;
 
         private readonly IMapper mapper;
-
 
         public GameProccessManager(IHubContext<MainHub> hubContext, IMapper mapper, IGamesCrudService gamesCrudService, IUnitOfWork unitOfWork, IUserCrudService userCrudService)
         {
@@ -38,15 +33,27 @@ namespace Fifth.Services
         public async Task CloseGameAsync(int id)
         {
             await gamesCrudService.DeleteAsync(id);
+            OnGameStartedOrClosed(id);
         }
 
-        public async Task<bool> EnterGameAsync(string connectionId, int gameId)
+        public async Task<bool> TryEnterGameAsync(string connectionId, int gameId)
         {
             var game = await gamesCrudService.GetGameAsync(gameId);
             if (game.GameData is null || game.GameInstance is null)
                 return false;
             var res = game.GameInstance.RegistPlayer(connectionId);
             return res;
+        }
+
+        public async Task<bool> TryStartGame(int gameId)
+        {
+            var game = await gamesCrudService.GetGameAsync(gameId);
+            if (game.GameData is null || game.GameInstance is null || game.GameInstance.PlayersCount != 2)
+                return false;
+            game.GameData.Started = true;
+            await gamesCrudService.UpdateAsync(game);
+            OnGameStartedOrClosed(gameId);
+            return true;
         }
 
         public async Task<int> CreateGameAsync(CreateGameVM createGameVM)
@@ -71,12 +78,9 @@ namespace Fifth.Services
             await hubContext.Clients.All.SendAsync("OnGameCreated", gameVm);
         }
 
-
         private async void OnGameStartedOrClosed(int gameid)
         {
-            var gameVM = await gamesCrudService.GetGameAsync(gameid);
-            await hubContext.Clients.All.SendAsync("OnGameStartedOrClosed", gameVM.GameData.Id);
+             await hubContext.Clients.All.SendAsync("OnGameStartedOrClosed", gameid);
         }
-
     }
 }

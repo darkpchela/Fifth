@@ -83,6 +83,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <script src="~/js/index.js"></script>
     <script>
+        function addCard(data) {
+            let cardElem = $('#cardPrototype').clone();
+            cardElem.removeAttr('id');
+            cardElem.attr("data-id", data.id)
+            $(cardElem).find('[name="game"]').text(data.name);
+            $(cardElem).find('[name="user"]').text(data.userName);
+            $(cardElem).find('[name="ref"]').prop('href', `/Home/Game/${data.id}`)
+            cardElem.prop('hidden', false);
+            $('#gameCards').append(cardElem);
+        };
+
+
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/MainHub")
             .build();
@@ -93,7 +105,8 @@
 
         hubConnection.on("OnGameStartedOrClosed", id => {
             console.log(`Game ${id} closed!`);
-            $(`div[data-id]='${id}'`).remove();
+            alert($(`#gameCards div[data-id="${id}"]`).length);
+            $(`#gameCards div[data-id="${id}"]`).remove();
         });
 
         hubConnection.on("OnGameCreated", gameVm => {

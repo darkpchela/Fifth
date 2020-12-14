@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Fifth.Models
 {
@@ -19,6 +16,14 @@ namespace Fifth.Models
 
         public string CurrentPlayer { get; private set; }
 
+        public int PlayersCount
+        {
+            get
+            {
+                return players.Count;
+            }
+        }
+
         public GameInstance(string id)
         {
             this.Id = id;
@@ -26,7 +31,7 @@ namespace Fifth.Models
 
         public bool TryMakeMove(int postion, string player)
         {
-            if (player != CurrentPlayer || postion < 0 || postion > 8 || map[postion]!=0 || movesCount >= 9)
+            if (player != CurrentPlayer || postion < 0 || postion > 8 || map[postion] != 0 || movesCount >= 9)
                 return false;
             map[postion] = moveValue;
             SwapMoveValue();
@@ -50,7 +55,6 @@ namespace Fifth.Models
         {
             players.Remove(connectionId);
         }
-
 
         private void SwapMoveValue()
         {

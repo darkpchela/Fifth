@@ -19,11 +19,11 @@ namespace Fifth.Services
 
         public async override Task OnConnectedAsync()
         {
-            var http = Context.GetHttpContext();
-            int gameId = http.Session.GetInt32("gameId").Value;
-            await Clients.All.SendAsync("Test", $"{http.User.Identity.Name} connected to hub");
+            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
+            await Clients.All.SendAsync("Test", $"{Context.User.Identity.Name} connected to hub");
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
             await TryEnterGame();
+            await TryStartGame();
             await base.OnConnectedAsync();
         }
 
@@ -31,14 +31,27 @@ namespace Fifth.Services
         {
             int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
             await gameManageService.CloseGameAsync(gameId);
-            await Clients.Group(gameId.ToString()).SendAsync("Test", $"{Context.GetHttpContext().User.Identity.Name} left game. Game #{gameId} closed.");
+            await Clients.Group(gameId.ToString()).SendAsync("Test", $"{Context.User.Identity.Name} left game. Game #{gameId} closed.");
             await base.OnDisconnectedAsync(exception);
+        }
+
+        private async Task TryStartGame()
+        {
+            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
+            var res = await gameManageService.TryStartGame(gameId);
+            if (res)
+                await Clients.Groups(gameId.ToString()).SendAsync("OnGameStarted");
+        }
+
+        public async Task MakeMove(int cellId)
+        {
+
         }
 
         private async Task TryEnterGame()
         {
             int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
-            var res = await gameManageService.EnterGameAsync(Context.ConnectionId, gameId);
+            var res = await gameManageService.TryEnterGameAsync(Context.ConnectionId, gameId);
             await Clients.Group(gameId.ToString()).SendAsync("OnPlayerEntered", Context.GetHttpContext().User.Identity.Name, Context.ConnectionId, res);
             if (!res)
             {
