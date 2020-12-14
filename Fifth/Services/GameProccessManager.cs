@@ -43,7 +43,7 @@ namespace Fifth.Services
         public async Task<bool> EnterGameAsync(string connectionId, int gameId)
         {
             var game = await gamesCrudService.GetGameAsync(gameId);
-            if (game is null)
+            if (game.GameData is null || game.GameInstance is null)
                 return false;
             var res = game.GameInstance.RegistPlayer(connectionId);
             return res;

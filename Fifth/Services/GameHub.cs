@@ -39,9 +39,10 @@ namespace Fifth.Services
         {
             int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
             var res = await gameManageService.EnterGameAsync(Context.ConnectionId, gameId);
+            await Clients.Group(gameId.ToString()).SendAsync("OnPlayerEntered", Context.GetHttpContext().User.Identity.Name, Context.ConnectionId, res);
             if (!res)
             {
-                await Clients.Client(Context.ConnectionId).SendAsync("Test", "Game already started!");
+                await Clients.Caller.SendAsync("Diconnect");
                 Context.Abort();
             }
         }

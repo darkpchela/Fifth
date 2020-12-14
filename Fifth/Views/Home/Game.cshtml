@@ -1,10 +1,10 @@
 ﻿<div class="text-success float-left ml-2 mt-2">
-    <h2>
+    <h2 id="playerA">
         PlayerA
     </h2>
 </div>
 <div class="text-success float-right mr-2 mt-2">
-    <h2>
+    <h2 id="playerB">
         PlayerB
     </h2>
 </div>
@@ -36,19 +36,25 @@
 
     </script>
     <script>
+        const homeUrl = "/Home/";
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/GameHub")
             .build();
 
 
-        hubConnection.on("Test", function (data) {
-            console.log(data);
+        hubConnection.on("OnPlayerEntered", function (userName, id) {
+                console.log(`$User: ${userName} ConnectionId: ${id}`);
+        });
+
+        hubConnection.on("Diconnect", function (userName, id) {
+                window.location.replace(homeUrl);
         });
 
         hubConnection.on("OnGameStarted", data => {
             console.log("Game Started");
             $('#gameboard button').prop("disabled", false);
         });
+
         hubConnection.start();
     </script>
 }
