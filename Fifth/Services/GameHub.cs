@@ -11,16 +11,17 @@ namespace Fifth.Services
     public class GameHub : Hub
     {
         private IGameProccessManager gameManageService;
+
         public GameHub(IGameProccessManager gameManageService)
         {
             this.gameManageService = gameManageService;
         }
+
         public async override Task OnConnectedAsync()
         {
             var http = Context.GetHttpContext();
             int gameId = http.Session.GetInt32("gameId").Value;
             await Clients.All.SendAsync("Test", $"{http.User.Identity.Name} connected to hub");
-            await Clients.All.SendAsync("Test", $"{Context.ConnectionId} connected to hub");
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
             await TryEnterGame();
             await base.OnConnectedAsync();
@@ -37,8 +38,12 @@ namespace Fifth.Services
         private async Task TryEnterGame()
         {
             int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
-            var res = await gameManageService.EnterGameAsync(Context.ConnectionId, "", gameId);
-            await Clients.Group(gameId.ToString()).SendAsync("Test", $"{res}");
+            var res = await gameManageService.EnterGameAsync(Context.ConnectionId, gameId);
+            if (!res)
+            {
+                await Clients.Client(Context.ConnectionId).SendAsync("Test", "Game already started!");
+                Context.Abort();
+            }
         }
     }
 }

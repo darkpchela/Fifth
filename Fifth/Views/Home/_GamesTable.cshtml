@@ -15,7 +15,7 @@
     </div>
     @foreach (var g in  await gameService.GetOpenedGamesAsync())
     {
-        <div class="p-2">
+        <div data-id="@g.Id" class="p-2">
             <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
                 <div class="card-body border rounded border-warning text-center">
                     <h5 class="card-title"> @g.Name</h5>
@@ -25,4 +25,14 @@
             </div>
         </div>
     }
+</div>
+
+<div id="cardPrototype" class="p-2" hidden>
+    <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
+        <div class="card-body border rounded border-warning text-center">
+            <h5 name="game" class="card-title"></h5>
+            <h6 name="user" class="card-text"></h6>
+            <a name="ref" class="text-warning">Join</a>
+        </div>
+    </div>
 </div>

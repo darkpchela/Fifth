@@ -40,17 +40,20 @@ namespace Fifth.Services
             await gamesCrudService.DeleteAsync(id);
         }
 
-        public async Task<bool> EnterGameAsync(string connectionId, string userName ,int gameId)
+        public async Task<bool> EnterGameAsync(string connectionId, int gameId)
         {
-
-            return true;
+            var game = await gamesCrudService.GetGameAsync(gameId);
+            if (game is null)
+                return false;
+            var res = game.GameInstance.RegistPlayer(connectionId);
+            return res;
         }
 
         public async Task<int> CreateGameAsync(CreateGameVM createGameVM)
         {
             var user = await userCrudService.GetByLoginAsync(createGameVM.Username);
             var gameId = await gamesCrudService.CreateAsync(createGameVM.Name, user);
-
+            OnGameCreated(gameId);
             return gameId;
         }
 
@@ -63,8 +66,16 @@ namespace Fifth.Services
 
         private async void OnGameCreated(int gameId)
         {
-            var gameVM = await gamesCrudService.GetGameAsync(gameId);
-            await hubContext.Clients.All.SendAsync("OnGameCreated", gameVM.GameInstance);
+            var game = await gamesCrudService.GetGameAsync(gameId);
+            var gameVm = mapper.Map<GameSessionVM>(game.GameData);
+            await hubContext.Clients.All.SendAsync("OnGameCreated", gameVm);
+        }
+
+
+        private async void OnGameStartedOrClosed(int gameid)
+        {
+            var gameVM = await gamesCrudService.GetGameAsync(gameid);
+            await hubContext.Clients.All.SendAsync("OnGameStartedOrClosed", gameVM.GameData.Id);
         }
 
     }

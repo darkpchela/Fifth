@@ -7,6 +7,7 @@ if (input) {
     })
     tagify.settings.whitelist.splice(0, 2, 'a', 'b');
 }
+
 $('#tagsCloud a, #tagsFilter a').click((e) => {
     e.preventDefault();
     let selected = $(e.target).attr('data-selected');
@@ -19,15 +20,21 @@ $('#tagsCloud a, #tagsFilter a').click((e) => {
         e.target.setAttribute('data-selected', 0);
     }
 });
+
 $('#newGame').click((e) => {
     e.preventDefault();
     $('#modal').modal('show');
 })
-function addGameCard(data) {
-    let userName = data.UserName;
-    let gameName = data.GameName;
-    let gameCardElem = '<div class="p-2"><div class="card border rounded border-warning ml-1 mr-1 bg-secondary"><div class="card-body border rounded border-warning">' +
-        `<h5 class="card-title">${gameName}</h5><span class="card-text">${userName}</span><a>Play</a></div></div></div>`;
-    $('#gameCards').append(gameCardElem);
-}
+
+function addCard(data) {
+    let cardElem = $('#cardPrototype').clone();
+    cardElem.removeAttr('id');
+    cardElem.attr("data-id", data.id)
+    $(cardElem).find('[name="game"]').text(data.name);
+    $(cardElem).find('[name="user"]').text(data.userName);
+    $(cardElem).find('[name="ref"]').prop('href', `/Home/Game/${data.id}`)
+    cardElem.prop('hidden', false);
+    $('#gameCards').append(cardElem);
+};
+
 

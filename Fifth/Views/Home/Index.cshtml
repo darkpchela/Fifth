@@ -55,7 +55,6 @@
                     <div class="modal-footer">
                         <button type="submit" class="btn text-warning bg-dark btn-lg" rel="modal:close">Create</button>
                         <a href="#" class="btn text-warning bg-dark btn-lg " rel="modal:close">Close</a>
-                        <button id="sendBtn">Test</button>
                     </div>
                 </form>
             }
@@ -76,13 +75,14 @@
     </div>
 </div>
 
+<button id="sendBtn">Test</button>
+
 @section Scripts{
     <script src="~/lib/tagify/tagify.min.js"></script>
     <script src="~/lib/tagify/jQuery.tagify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <script src="~/js/index.js"></script>
     <script>
-
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/MainHub")
             .build();
@@ -91,11 +91,14 @@
             console.log(data);
         });
 
-        hubConnection.on("OnGameCreated", data => {
-            console.log(data);
-            let gameCardElem = '<div class="p-2"><div class="card border rounded border-warning ml-1 mr-1 bg-secondary"><div class="card-body border rounded border-warning">' +
-                `<h5 class="card-title">${data.name}</h5><span class="d-block card-text">${data.userName}</span><a href="/Home/Game/${data.id}">Join</a></div></div></div>`;
-            $('#gameCards').append(gameCardElem);
+        hubConnection.on("OnGameStartedOrClosed", id => {
+            console.log(`Game ${id} closed!`);
+            $(`div[data-id]='${id}'`).remove();
+        });
+
+        hubConnection.on("OnGameCreated", gameVm => {
+            console.log("Created");
+            addCard(gameVm);
         });
 
         hubConnection.start();

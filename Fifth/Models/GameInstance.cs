@@ -17,8 +17,6 @@ namespace Fifth.Models
 
         public string Id { get; }
 
-        public int PlayersCount { get; } = 0;
-
         public string CurrentPlayer { get; private set; }
 
         public GameInstance(string id)
@@ -40,11 +38,19 @@ namespace Fifth.Models
             return "Not implemted";
         }
 
-        public void RegistPlayer(string connectionId)
+        public bool RegistPlayer(string connectionId)
         {
-            if(PlayersCount < 2)
+            if (players.Count >= 2)
+                return false;
             players.Add(connectionId);
+            return true;
         }
+
+        public void KickPlayer(string connectionId)
+        {
+            players.Remove(connectionId);
+        }
+
 
         private void SwapMoveValue()
         {
