@@ -38,25 +38,42 @@
             .withUrl("/GameHub")
             .build();
 
-        let makeMove = (index) => hubConnection.invoke("MakeMove", index);
+        let myChar;
+        let myMove = false;
 
         hubConnection.on("OnPlayerEntered", function (userName, id) {
                 console.log(`$User: ${userName} ConnectionId: ${id}`);
         });
 
-        hubConnection.on("Diconnect", function (userName, id) {
-                window.location.replace(homeUrl);
+        hubConnection.on("Disconnect", () => {
+            window.location.replace(homeUrl);
         });
 
         hubConnection.on("OnGameStarted", data => {
-            alert("Game started!");
-            $('#gameboard button').prop("disabled", false);
+            if (myMove)
+                $('#gameboard button').prop("disabled", false);
         });
 
         hubConnection.on("OnMoveMaid", index => {
-            alert("Move maid");
-            $(`#gameboard #${index}`).prop("disabled", true);
+            let btn = $(`#gameboard #${index}`);
+            btn.prop("disabled", true);
+            if (myMove) {
+                $('#gameboard button').prop("disabled", true);
+                myChar == "o" ? btn.append(circleElem) : btn.append(crossElem);
+            }
+            else {
+                $('#gameboard button').prop("disabled", false);
+                myChar == "o" ? btn.append(crossElem) : btn.append(circleElem);
+            }
+            myMove = !myMove;
         });
+
+        hubConnection.on("AcceptChar", char => {
+            myChar = char;
+            if (myChar == "x")
+                myMove = true;
+        });
+
 
         $('#gameboard button').click(e => {
             e.preventDefault();
