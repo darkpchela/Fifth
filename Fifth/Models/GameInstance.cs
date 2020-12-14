@@ -11,6 +11,8 @@ namespace Fifth.Models
 
         private int[] map = new int[9];
 
+        private string PlayerX;
+
         private List<string> players = new List<string>();
 
         public string Id { get; }
@@ -42,14 +44,14 @@ namespace Fifth.Models
 
         public string CalcResult()
         {
-            return "Not implemted";
+            return "Not imnplemented!";
         }
 
         public void StartGame()
         {
             Random rnd = new Random();
             var index = rnd.Next(0, 1);
-            CurrentPlayer = players[index];
+            CurrentPlayer = PlayerX = players[index];
         }
 
         public bool RegistPlayer(string connectionId)
@@ -71,7 +73,6 @@ namespace Fifth.Models
                 moveValue = 1;
             else
                 moveValue = 1;
-
             movesCount++;
         }
 
@@ -81,6 +82,70 @@ namespace Fifth.Models
                 CurrentPlayer = players[1];
             else
                 CurrentPlayer = players[0];
+        }
+
+        private bool CheckLines(int[] array, int rowLength)
+        {
+            bool isMathed = false;
+            for (int i = 0; i < array.Length / rowLength; i++)
+            {
+                for (int j = 1; j < rowLength; j++)
+                {
+                    if (array[i * rowLength + j] == array[i * rowLength + j - 1])
+                        isMathed = true;
+                    else
+                    {
+                        isMathed = false;
+                        break;
+                    }
+                }
+                if (isMathed)
+                    break;
+            }
+            return isMathed;
+        }
+
+        private bool CheckColumns(int[] array, int rowLength)
+        {
+            bool isMathed = false;
+            for (int i = 0; i < array.Length / rowLength; i++)
+            {
+                for (int j = 1; j < rowLength; j++)
+                {
+                    if (array[i + rowLength * j] == array[i + rowLength * (j - 1)])
+                        isMathed = true;
+                    else
+                    {
+                        isMathed = false;
+                        break;
+                    }
+                }
+                if (isMathed)
+                    break;
+            }
+            return isMathed;
+        }
+
+        private bool CheckDiagonals(int[] array, int rank)
+        {
+            bool isMatched = false;
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 1; j < rank; j++)
+                {
+                    int k = (int)Math.Pow(-1, i);
+                    if (array[rank * j + j * k + (rank - 1) * i] == array[rank * (j - 1) + (j - 1) * k + (rank - 1) * i])
+                        isMatched = true;
+                    else
+                    {
+                        isMatched = false;
+                        break;
+                    }
+                }
+                if (isMatched)
+                    break;
+            }
+            return isMatched;
         }
     }
 }
