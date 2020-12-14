@@ -1,14 +1,4 @@
-﻿let tagify;
-let input = document.querySelector('#tagsInput');
-if (input) {
-    tagify = new Tagify(input, {
-        whitelist: [],
-        maxTags: 10
-    })
-    tagify.settings.whitelist.splice(0, 2, 'a', 'b');
-}
-
-$('#tagsCloud a, #tagsFilter a').click((e) => {
+﻿$('#tagsCloud a, #tagsFilter a').click((e) => {
     e.preventDefault();
     let selected = $(e.target).attr('data-selected');
     if (selected == 0) {
