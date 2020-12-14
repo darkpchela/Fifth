@@ -11,10 +11,12 @@ namespace Fifth.Services
     public class GameHub : Hub
     {
         private IGameProccessManager gameManageService;
+        private IGamesCrudService gamesCrudService;
 
-        public GameHub(IGameProccessManager gameManageService)
+        public GameHub(IGameProccessManager gameManageService, IGamesCrudService gamesCrudService)
         {
             this.gameManageService = gameManageService;
+            this.gamesCrudService = gamesCrudService;
         }
 
         public async override Task OnConnectedAsync()
@@ -43,9 +45,13 @@ namespace Fifth.Services
                 await Clients.Groups(gameId.ToString()).SendAsync("OnGameStarted");
         }
 
-        public async Task MakeMove(int cellId)
+        public async Task MakeMove(string index)
         {
-
+            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
+            var game = await gamesCrudService.GetGameAsync(gameId);
+            var res = game.GameInstance.TryMakeMove(int.Parse(index), Context.ConnectionId);
+            if (res)
+                await Clients.Group(gameId.ToString()).SendAsync("OnMoveMaid", index);
         }
 
         private async Task TryEnterGame()

@@ -51,6 +51,7 @@ namespace Fifth.Services
             if (game.GameData is null || game.GameInstance is null || game.GameInstance.PlayersCount != 2)
                 return false;
             game.GameData.Started = true;
+            game.GameInstance.StartGame();
             await gamesCrudService.UpdateAsync(game);
             OnGameStartedOrClosed(gameId);
             return true;

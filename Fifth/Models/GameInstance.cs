@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Fifth.Models
 {
@@ -35,12 +36,20 @@ namespace Fifth.Models
                 return false;
             map[postion] = moveValue;
             SwapMoveValue();
+            SwapCurrentPlayer();
             return true;
         }
 
         public string CalcResult()
         {
             return "Not implemted";
+        }
+
+        public void StartGame()
+        {
+            Random rnd = new Random();
+            var index = rnd.Next(0, 1);
+            CurrentPlayer = players[index];
         }
 
         public bool RegistPlayer(string connectionId)
@@ -64,6 +73,14 @@ namespace Fifth.Models
                 moveValue = 1;
 
             movesCount++;
+        }
+
+        private void SwapCurrentPlayer()
+        {
+            if (CurrentPlayer == players[0])
+                CurrentPlayer = players[1];
+            else
+                CurrentPlayer = players[0];
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Fifth
             services.AddSingleton<IGameInstanceRepository, GameInstanceRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutomapperProfiles();
-            services.AddScoped<IGamesCrudService, GamesCrudService>();
+            services.AddTransient<IGamesCrudService, GamesCrudService>();
             services.AddScoped<IUserCrudService, UserCrudService>();
             services.AddSignalR();
         }
