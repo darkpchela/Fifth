@@ -27,7 +27,8 @@ namespace Fifth
             services.AddControllersWithViews();
             services.AddScoped<IGameProccessManager, GameProccessManager>();
             services.AddDbContext<AppDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("Default")));
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Home"));
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/SignIn"));
             services.AddHttpContextAccessor();
             services.AddDistributedMemoryCache();
             services.AddSession();
