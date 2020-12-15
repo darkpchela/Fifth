@@ -56,7 +56,7 @@ namespace Fifth.Controllers
             createGameVM.Username = HttpContext.User.Identity.Name;
             //var a = JsonConvert.DeserializeObject<Tag[]>(createGameVM.Tags);
             int id = await gameManageService.OpenGameAsync(createGameVM);
-            return Json(new { id = id});
+            return PartialView("_GameCreated", id);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

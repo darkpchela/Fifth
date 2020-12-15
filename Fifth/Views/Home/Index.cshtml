@@ -23,7 +23,7 @@
     </div>
 </div>
 
-<div id="gamesTable" class="col-8 offset-2">
+<div id="gamesTable" class="col-8 offset-2 h-100">
 </div>
 
 <div id="modal" class="modal" tabindex="-1">
@@ -62,21 +62,32 @@
     <script src="~/lib/tagify/jQuery.tagify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <script @*src="~/js/index.js"*@>
-        //const updateReferences = () => {
-
-        //    $('#newGame').click((e) => {
-        //        e.preventDefault();
-        //        $('#modal').modal('show');
-        //    })
-        //}
-    </script>
-    <script>
-
-
-
-        const goToGame = id => window.replace(`Home/Game/${id}`)
-
-        const updateTable = () => {
+        const updateNewGameRef = () => {
+            $('#newGame').click((e) => {
+                e.preventDefault();
+                $('#modal').modal('show');
+            })
+        };
+        const updateCreateGameRef = () => {
+            $('#btnCreate').click(e => {
+                e.preventDefault();
+                let data = $('#createForm').serialize();
+                createGameAjax(data);
+            })
+        };
+        const createGameAjax = data => {
+            $.ajax({
+                type: "post",
+                url: "Home/CreateGame",
+                data: data,
+                success: data => {
+                    $('#modalContent').empty();
+                    $('#modalContent').append(data);
+                    updateCreateGameRef();
+                }
+            });
+        }
+        const updateTableAjax = () => {
             $.ajax({
                 type: "GET",
                 url: "Home/_GamesTable",
@@ -86,31 +97,16 @@
                     $('#newGame').click((e) => {
                         e.preventDefault();
                         $('#modal').modal('show');
+                        updateNewGameRef();
                     });
                 }
             });
         };
-
-        $(updateTable());
-
-        $('#btnCreate').click(e => {
-            e.preventDefault();
-            let data = $('#createForm').serialize();
-            $.ajax({
-                type: "post",
-                url: "Home/CreateGame",
-                data: data,
-                success: data => {
-                    if (data.id != undefined) {
-                        $('#modal').modal('close')
-                    }
-                    else {
-                        $('#modalContent').empty();
-                        $('#modalContent').append(data);
-                    }
-                }
-            });
-        })
+    </script>
+    <script>
+        $(updateTableAjax());
+        $(updateCreateGameRef());
+        $(updateNewGameRef());
     </script>
     <script>
         function addCard(data) {
