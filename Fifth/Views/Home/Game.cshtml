@@ -21,6 +21,35 @@
         </div>
     </div>
 </div>
+<div id="modalResult" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered text-warning">
+        <div class="modal-content bg-secondary border border-warning rounded">
+            <div class="modal-header">
+                <h4 class="modal-title">Game over!</h4>
+                <a href="#" class="btn text-white bg-dark btn-lg close"  data-toggle="modal" data-target="#modalResult" rel="modal:close" aria-hidden="true">&times;</a>
+            </div>
+            <h3 id="result" class="modal-body">
+            </h3>
+            <div class="modal-footer">
+                <a asp-action="Index" asp-controller="Home" class="btn text-warning bg-dark btn-lg ">Quit</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modalStart" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered text-warning w-25 h-25">
+        <div class="modal-content bg-secondary border border-warning rounded">
+            <div class="modal-header">
+                <h4 class="modal-title">Game started!</h4>
+                <a href="#" class="btn text-white bg-dark btn-lg close"  data-toggle="modal" data-target="#modalStart" rel="modal:close"
+                   aria-hidden="true">&times;</a>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn text-warning bg-dark btn-lg " data-toggle="modal" data-target="#modalStart" rel="modal:close">OK</a>
+            </div>
+        </div>
+    </div>
+</div>
 <button id="test">
     test
 </button>
@@ -39,6 +68,11 @@
         const getElemId = elem => $(elem).attr('id');
         const userNameElems = $('div[name="userName"] h2');
         const turnOffOnSuccess = (elem) => elem.hasClass("text-success") ? elem.removeClass("text-success") : elem.addClass("text-success");
+        const showStartModal = () => $('#modalStart').modal('show');
+        const showResultModal = (resultStr) => {
+            $('#result').text(resultStr);
+            $('#modalResult').modal('show');
+        };
 
         disableField();
     </script>
@@ -81,7 +115,7 @@
         });
 
         hubConnection.on("OnGameStarted", data => {
-            alert("Game Started")
+            showStartModal();
             if (isMyMove) {
                 turnOffOnSuccess($(`h2[data-id=${myConnectionId}]`));
                 enableField();
@@ -107,14 +141,13 @@
 
         hubConnection.on("AcceptChar", char => {
             myChar = char;
-            alert(myChar)
             if (myChar == "x")
                 isMyMove = true;
         });
 
         hubConnection.on("OnGameOver", res => {
             disableField();
-            alert(res);
+            showResultModal(res);
         });
 
         $('#gameboard button').click(e => {
