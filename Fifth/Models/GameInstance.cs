@@ -41,7 +41,7 @@ namespace Fifth.Models
         public void StartGame()
         {
             Random rnd = new Random();
-            var index = rnd.Next(0, 1);
+            var index = rnd.Next(0, 2);
             CurrentPlayer = players[index];
         }
 
