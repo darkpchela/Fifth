@@ -11,6 +11,7 @@ namespace Fifth.Services
     {
         private IGameProccessManager gameProccessManager;
         private IGamesCrudService gamesCrudService;
+        private IUserCrudService userCrudService;
 
         public GameHub(IGameProccessManager gameProccessManager, IGamesCrudService gamesCrudService)
         {
@@ -20,17 +21,16 @@ namespace Fifth.Services
 
         public async override Task OnConnectedAsync()
         {
-            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
-            await Clients.All.SendAsync("Test", $"{Context.User.Identity.Name} connected to hub");
+            int gameId = GetCurrentGameId();
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
-            await TryEnterGame();
-            await TryStartGame();
+            await TryEnterGame(gameId);
+            await TryStartGame(gameId);
             await base.OnConnectedAsync();
         }
 
         public async override Task OnDisconnectedAsync(Exception exception)
         {
-            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
+            int gameId = GetCurrentGameId();
             await gameProccessManager.CloseGameAsync(gameId);
             await Clients.Group(gameId.ToString()).SendAsync("Disconnect");
             Context.Abort();
@@ -39,7 +39,7 @@ namespace Fifth.Services
 
         public async Task AcceptMoveRequest(string index)
         {
-            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
+            int gameId = GetCurrentGameId();
             var game = await gamesCrudService.GetGameAsync(gameId);
             if (!game.IsAlive() || !int.TryParse(index, out int posIndex))
                 await Clients.Group(gameId.ToString()).SendAsync("Disconnect");
@@ -47,9 +47,15 @@ namespace Fifth.Services
                 await HandleMoveRequest(game, posIndex);
         }
 
-        private async Task TryStartGame()
+        public async Task GetPlayersRequest()
         {
-            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
+            int gameId = GetCurrentGameId();
+            var game = await gamesCrudService.GetGameAsync(gameId);
+            //`````````````````
+        }
+
+        private async Task TryStartGame(int gameId)
+        {
             Game game = await gamesCrudService.GetGameAsync(gameId);
             if (!game.IsAlive())
                 return;
@@ -76,16 +82,12 @@ namespace Fifth.Services
                 await Clients.Group(game.GameInstance.Id).SendAsync("OnGameOver", res.GameResult.ToString());
         }
 
-        private async Task TryEnterGame()
+        private async Task TryEnterGame(int gameId)
         {
-            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
             var res = await gameProccessManager.TryEnterGameAsync(Context.ConnectionId, gameId);
             await Clients.Group(gameId.ToString()).SendAsync("OnPlayerEntered", Context.GetHttpContext().User.Identity.Name, Context.ConnectionId, res);
             if (!res)
-            {
                 await Clients.Caller.SendAsync("Disconnect");
-                Context.Abort();
-            }
         }
 
         private async Task AssignChars(Game game)
@@ -93,6 +95,15 @@ namespace Fifth.Services
             var starter = game.GameInstance.CurrentPlayer;
             await Clients.GroupExcept(game.GameInstance.Id, starter).SendAsync("AcceptChar", "o");
             await Clients.Client(starter).SendAsync("AcceptChar", "x");
+        }
+
+        private int GetCurrentGameId()
+        {
+            var id = Context.GetHttpContext().Session.GetInt32("gameId");
+            if (id.HasValue)
+                return id.Value;
+            else
+                return -1;
         }
     }
 }

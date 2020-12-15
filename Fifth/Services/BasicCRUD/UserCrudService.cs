@@ -33,6 +33,11 @@ namespace Fifth.Services.BasicCRUD
             return user;
         }
 
+        //public async Task<IEnumerable<User>> GetByGameAsync(int gameId)
+        //{
+
+        //}
+
         public async Task<IEnumerable<User>> GetAll()
         {
             return await unitOfWork.DbContext.Users.ToListAsync();
