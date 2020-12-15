@@ -9,7 +9,7 @@ namespace Fifth.ViewModels
         [MinLength(3)]
         public string Name { get; set; }
 
-        public IList<string> Tags { get; set; }
+        public string Tags { get; set; }
 
         public string Username { get; set; }
     }

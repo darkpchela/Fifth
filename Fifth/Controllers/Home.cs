@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Text.Json;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Fifth.Controllers
 {
@@ -42,6 +45,7 @@ namespace Fifth.Controllers
         public async Task<IActionResult> CreateGame(CreateGameVM createGameVM)
         {
             createGameVM.Username = HttpContext.User.Identity.Name;
+            //var a = JsonConvert.DeserializeObject<Tag[]>(createGameVM.Tags);
             int id = await gameManageService.CreateGameAsync(createGameVM);
             return RedirectToAction(nameof(Game), new { id = id });
         }
@@ -50,6 +54,12 @@ namespace Fifth.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public class Tag
+        {
+            public int? Id { get; set; }
+            public string Value { get; set; }
         }
     }
 }

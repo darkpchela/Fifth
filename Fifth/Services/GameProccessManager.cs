@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Fifth.Interfaces;
+using Fifth.Models;
 using Fifth.ViewModels;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -39,21 +40,19 @@ namespace Fifth.Services
         public async Task<bool> TryEnterGameAsync(string connectionId, int gameId)
         {
             var game = await gamesCrudService.GetGameAsync(gameId);
-            if (game.GameData is null || game.GameInstance is null)
+            if (!game.IsAlive())
                 return false;
             var res = game.GameInstance.RegistPlayer(connectionId);
             return res;
         }
 
-        public async Task<bool> TryStartGame(int gameId)
+        public async Task<bool> TryStartGameAsync(Game game)
         {
-            var game = await gamesCrudService.GetGameAsync(gameId);
-            if (game.GameData is null || game.GameInstance is null || game.GameInstance.PlayersCount != 2)
+            if (!game.IsAlive() || !game.GameInstance.IsReadyToStart)
                 return false;
-            game.GameData.Started = true;
-            game.GameInstance.StartGame();
+            game.Start();
             await gamesCrudService.UpdateAsync(game);
-            OnGameStartedOrClosed(gameId);
+            OnGameStartedOrClosed(game.GameData.Id);
             return true;
         }
 
@@ -81,7 +80,7 @@ namespace Fifth.Services
 
         private async void OnGameStartedOrClosed(int gameid)
         {
-             await hubContext.Clients.All.SendAsync("OnGameStartedOrClosed", gameid);
+            await hubContext.Clients.All.SendAsync("OnGameStartedOrClosed", gameid);
         }
     }
 }

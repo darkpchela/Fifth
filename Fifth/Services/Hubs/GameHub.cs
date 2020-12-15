@@ -1,21 +1,20 @@
 ﻿using Fifth.Interfaces;
+using Fifth.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Fifth.Services
 {
     public class GameHub : Hub
     {
-        private IGameProccessManager gameManageService;
+        private IGameProccessManager gameProccessManager;
         private IGamesCrudService gamesCrudService;
 
-        public GameHub(IGameProccessManager gameManageService, IGamesCrudService gamesCrudService)
+        public GameHub(IGameProccessManager gameProccessManager, IGamesCrudService gamesCrudService)
         {
-            this.gameManageService = gameManageService;
+            this.gameProccessManager = gameProccessManager;
             this.gamesCrudService = gamesCrudService;
         }
 
@@ -32,40 +31,55 @@ namespace Fifth.Services
         public async override Task OnDisconnectedAsync(Exception exception)
         {
             int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
-            await gameManageService.CloseGameAsync(gameId);
+            await gameProccessManager.CloseGameAsync(gameId);
             await Clients.Group(gameId.ToString()).SendAsync("Disconnect");
             Context.Abort();
             await base.OnDisconnectedAsync(exception);
         }
 
-        private async Task TryStartGame()
-        {
-            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
-            var res = await gameManageService.TryStartGame(gameId);
-            if (!res)
-                return;
-            await AssignChars(gameId);
-            await Clients.Groups(gameId.ToString()).SendAsync("OnGameStarted");
-        }
-
-        public async Task MakeMove(string index)
+        public async Task AcceptMoveRequest(string index)
         {
             int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
             var game = await gamesCrudService.GetGameAsync(gameId);
-            if(game is null)
-            {
+            if (!game.IsAlive() || !int.TryParse(index, out int posIndex))
                 await Clients.Group(gameId.ToString()).SendAsync("Disconnect");
+            else
+                await HandleMoveRequest(game, posIndex);
+        }
+
+        private async Task TryStartGame()
+        {
+            int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
+            Game game = await gamesCrudService.GetGameAsync(gameId);
+            if (!game.IsAlive())
                 return;
-            }
-            var res = game.GameInstance.TryMakeMove(int.Parse(index), Context.ConnectionId);
+            else
+                await HandleStartGameRequest(game);
+        }
+
+        private async Task HandleStartGameRequest(Game game)
+        {
+            var res = await gameProccessManager.TryStartGameAsync(game);
             if (res)
-                await Clients.Group(gameId.ToString()).SendAsync("OnMoveMaid", index);
+            {
+                await AssignChars(game);
+                await Clients.Groups(game.GameInstance.Id.ToString()).SendAsync("OnGameStarted");
+            }
+        }
+
+        private async Task HandleMoveRequest(Game game, int index)
+        {
+            var res = game.GameInstance.MakeMove(index, Context.ConnectionId);
+            if (res.MoveMaid)
+                await Clients.Group(game.GameInstance.Id).SendAsync("OnMoveMaid", index);
+            if (res.GameFinished)
+                await Clients.Group(game.GameInstance.Id).SendAsync("OnGameOver", res.GameResult.ToString());
         }
 
         private async Task TryEnterGame()
         {
             int gameId = Context.GetHttpContext().Session.GetInt32("gameId").Value;
-            var res = await gameManageService.TryEnterGameAsync(Context.ConnectionId, gameId);
+            var res = await gameProccessManager.TryEnterGameAsync(Context.ConnectionId, gameId);
             await Clients.Group(gameId.ToString()).SendAsync("OnPlayerEntered", Context.GetHttpContext().User.Identity.Name, Context.ConnectionId, res);
             if (!res)
             {
@@ -74,13 +88,11 @@ namespace Fifth.Services
             }
         }
 
-        private async Task AssignChars(int gameId)
+        private async Task AssignChars(Game game)
         {
-            var game = await gamesCrudService.GetGameAsync(gameId);
             var starter = game.GameInstance.CurrentPlayer;
-            await Clients.GroupExcept(gameId.ToString(), starter).SendAsync("AcceptChar", "o");
+            await Clients.GroupExcept(game.GameInstance.Id, starter).SendAsync("AcceptChar", "o");
             await Clients.Client(starter).SendAsync("AcceptChar", "x");
         }
-
     }
 }

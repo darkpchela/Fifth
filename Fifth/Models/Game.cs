@@ -17,5 +17,18 @@
             this.GameData = gameData;
             this.GameInstance = gameInstance;
         }
+
+        public void Start()
+        {
+            GameData.Started = true;
+            GameInstance.StartGame();
+        }
+
+        public bool IsAlive()
+        {
+            if (GameInstance is null || GameData is null)
+                return false;
+            return true;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Fifth.ViewModels;
+﻿using Fifth.Models;
+using Fifth.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,6 +15,6 @@ namespace Fifth.Interfaces
 
         Task<IList<GameSessionVM>> GetOpenedGamesAsync();
 
-        Task<bool> TryStartGame(int gameId);
+        Task<bool> TryStartGameAsync(Game game);
     }
 }

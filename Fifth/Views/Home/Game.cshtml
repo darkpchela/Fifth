@@ -1,11 +1,10 @@
-﻿<div class="text-success float-left ml-2 mt-2">
-    <h2 id="playerA">
-        PlayerA
+﻿<div class="text-danger float-left ml-2 mt-2">
+    <h2 id="me">
+        @User.Identity.Name
     </h2>
 </div>
-<div class="text-success float-right mr-2 mt-2">
-    <h2 id="playerB">
-        PlayerB
+<div class="text-danger float-right mr-2 mt-2">
+    <h2 id="opponent">
     </h2>
 </div>
 <div class="game-board position-fixed" id='gameboard'>
@@ -42,7 +41,8 @@
         let myMove = false;
 
         hubConnection.on("OnPlayerEntered", function (userName, id) {
-                console.log(`$User: ${userName} ConnectionId: ${id}`);
+            $('#opponent').text(userName);
+             console.log(`$User: ${userName} ConnectionId: ${id}`);
         });
 
         hubConnection.on("Disconnect", () => {
@@ -50,8 +50,13 @@
         });
 
         hubConnection.on("OnGameStarted", data => {
-            if (myMove)
+            if (myMove) {
                 $('#gameboard button').prop("disabled", false);
+                $('#me').addClass("text-success")
+            }
+            else {
+                $('#opponent').addClass("text-success")
+            }
         });
 
         hubConnection.on("OnMoveMaid", index => {
@@ -74,12 +79,16 @@
                 myMove = true;
         });
 
+        hubConnection.on("OnGameOver", res => {
+            alert(res);
+        });
+
 
         $('#gameboard button').click(e => {
             e.preventDefault();
             alert("MoveSend")
             let index = $(e.target).attr('id');
-            hubConnection.invoke('MakeMove', index);
+            hubConnection.invoke('AcceptMoveRequest', index);
         });
 
         hubConnection.start();
