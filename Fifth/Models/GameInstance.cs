@@ -6,11 +6,13 @@ namespace Fifth.Models
 {
     public class GameInstance
     {
-        private int moveValue = 1;
+        private char moveValue = 'x';
 
         private int movesCount = 0;
 
-        private int[] map = new int[9];
+        private char[] map = Enumerable.Repeat('n', 9).ToArray();
+
+        private Dictionary<char, UserConnection> charUser = new Dictionary<char, UserConnection>();
 
         public string Id { get; }
 
@@ -27,23 +29,22 @@ namespace Fifth.Models
 
         public MoveResult MakeMove(int postion, string connectionId)
         {
-            if (connectionId != CurrentPlayer.ConnectionId || postion < 0 || postion > 8 || map[postion] != 0 || movesCount >= 9)
+            if (connectionId != CurrentPlayer.ConnectionId || postion < 0 || postion > 8 || map[postion] != 'n' || movesCount >= 9)
                 return new MoveResult(false);
             map[postion] = moveValue;
             SwapMoveValue();
             SwapCurrentPlayer();
-            int res = CalcResult();
-            if (res == 0 && movesCount < 9)
-                return new MoveResult(true);
-            return new MoveResult(res);
+            MoveResult res = CalcResult();
+            return res;
         }
-
 
         public void StartGame()
         {
             Random rnd = new Random();
             var index = rnd.Next(0, 2);
             CurrentPlayer = players[index];
+            charUser.Add('x', CurrentPlayer);
+            charUser.Add('o', players.FirstOrDefault(u => u != CurrentPlayer));
         }
 
         public bool RegistPlayer(string connectionId, User user)
@@ -63,10 +64,10 @@ namespace Fifth.Models
 
         private void SwapMoveValue()
         {
-            if (moveValue == 1)
-                moveValue = 2;
+            if (moveValue == 'x')
+                moveValue = 'o';
             else
-                moveValue = 1;
+                moveValue = 'x';
             movesCount++;
         }
 
@@ -78,18 +79,23 @@ namespace Fifth.Models
                 CurrentPlayer = players[0];
         }
 
-        private int CalcResult()
+        private MoveResult CalcResult()
         {
-            if (!CheckLines(map, 3, out int value))
+            if (!CheckLines(map, 3, out char value))
                 if (!CheckColumns(map, 3, out value))
                     CheckDiagonals(map, 3, out value);
-            return value;
+            if (value == 'n')
+                if (movesCount < 9)
+                    return new MoveResult(true);
+                else
+                    return new MoveResult("It's draw!");
+            return new MoveResult($"Winner is {charUser[value].UserName}!");
         }
 
-        private bool CheckLines(int[] array, int rowLength, out int value)
+        private bool CheckLines(char[] array, int rowLength, out char value)
         {
             bool isMathed = false;
-            value = 0;
+            value = 'n';
             for (int i = 0; i < array.Length / rowLength; i++)
             {
                 for (int j = 1; j < rowLength; j++)
@@ -101,7 +107,7 @@ namespace Fifth.Models
                     }
                     else
                     {
-                        value = 0;
+                        value = 'n';
                         isMathed = false;
                         break;
                     }
@@ -112,10 +118,10 @@ namespace Fifth.Models
             return isMathed;
         }
 
-        private bool CheckColumns(int[] array, int rowLength, out int value)
+        private bool CheckColumns(char[] array, int rowLength, out char value)
         {
             bool isMathed = false;
-            value = 0;
+            value = 'n';
             for (int i = 0; i < array.Length / rowLength; i++)
             {
                 for (int j = 1; j < rowLength; j++)
@@ -127,7 +133,7 @@ namespace Fifth.Models
                     }
                     else
                     {
-                        value = 0;
+                        value = 'n';
                         isMathed = false;
                         break;
                     }
@@ -138,10 +144,10 @@ namespace Fifth.Models
             return isMathed;
         }
 
-        private bool CheckDiagonals(int[] array, int rank, out int value)
+        private bool CheckDiagonals(char[] array, int rank, out char value)
         {
             bool isMatched = false;
-            value = 0;
+            value = 'n';
             for (int i = 0; i < 2; i++)
             {
                 for (int j = 1; j < rank; j++)
@@ -154,7 +160,7 @@ namespace Fifth.Models
                     }
                     else
                     {
-                        value = 0;
+                        value = 'n';
                         isMatched = false;
                         break;
                     }

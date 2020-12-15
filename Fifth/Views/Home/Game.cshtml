@@ -86,6 +86,8 @@
                 turnOffOnSuccess($(`h2[data-id=${myConnectionId}]`));
                 enableField();
             }
+            else
+                turnOffOnSuccess($(`h2[data-id!=${myConnectionId}]`));
         });
 
         hubConnection.on("OnMoveMaid", index => {
@@ -111,6 +113,7 @@
         });
 
         hubConnection.on("OnGameOver", res => {
+            disableField();
             alert(res);
         });
 

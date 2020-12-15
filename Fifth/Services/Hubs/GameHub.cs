@@ -12,7 +12,6 @@ namespace Fifth.Services
     {
         private IGameProccessManager gameProccessManager;
         private IGamesCrudService gamesCrudService;
-        private IUserCrudService userCrudService;
 
         public GameHub(IGameProccessManager gameProccessManager, IGamesCrudService gamesCrudService)
         {
@@ -83,7 +82,7 @@ namespace Fifth.Services
             if (res.MoveMaid)
                 await Clients.Group(game.GameInstance.Id).SendAsync("OnMoveMaid", index);
             if (res.GameFinished)
-                await Clients.Group(game.GameInstance.Id).SendAsync("OnGameOver", res.GameResult.ToString());
+                await Clients.Group(game.GameInstance.Id).SendAsync("OnGameOver", res.Result);
         }
 
         private async Task TryEnterGame(int gameId)
