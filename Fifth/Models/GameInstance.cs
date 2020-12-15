@@ -12,11 +12,13 @@ namespace Fifth.Models
 
         private int[] map = new int[9];
 
-        private IList<string> players;
-
         public string Id { get; }
 
-        public string CurrentPlayer { get; private set; }
+        public bool IsReadyToStart { get; private set; }
+
+        private List<UserConnection> players = new List<UserConnection>();
+
+        public UserConnection CurrentPlayer { get; private set; }
 
         public GameInstance(string id)
         {
@@ -25,7 +27,7 @@ namespace Fifth.Models
 
         public MoveResult MakeMove(int postion, string connectionId)
         {
-            if (connectionId != CurrentPlayer || postion < 0 || postion > 8 || map[postion] != 0 || movesCount >= 9)
+            if (connectionId != CurrentPlayer.ConnectionId || postion < 0 || postion > 8 || map[postion] != 0 || movesCount >= 9)
                 return new MoveResult(false);
             map[postion] = moveValue;
             SwapMoveValue();
@@ -37,12 +39,26 @@ namespace Fifth.Models
         }
 
 
-        public void StartGame(IList<string> connections)
+        public void StartGame()
         {
-            players = connections;
             Random rnd = new Random();
             var index = rnd.Next(0, 2);
             CurrentPlayer = players[index];
+        }
+
+        public bool RegistPlayer(string connectionId, User user)
+        {
+            if (players.Count >= 2 || string.IsNullOrEmpty(connectionId) || user is null)
+                return false;
+            players.Add(new UserConnection(user.Login, connectionId));
+            if (players.Count == 2)
+                IsReadyToStart = true;
+            return true;
+        }
+
+        public IEnumerable<UserConnection> GetPlayers()
+        {
+            return players.ToList();
         }
 
         private void SwapMoveValue()
@@ -61,6 +77,7 @@ namespace Fifth.Models
             else
                 CurrentPlayer = players[0];
         }
+
         private int CalcResult()
         {
             if (!CheckLines(map, 3, out int value))

@@ -1,4 +1,5 @@
-﻿using Fifth.Interfaces;
+﻿using Fifth.Extensions;
+using Fifth.Interfaces;
 using Fifth.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
@@ -33,7 +34,6 @@ namespace Fifth.Services
             int gameId = GetCurrentGameId();
             await gameProccessManager.CloseGameAsync(gameId);
             await Clients.Group(gameId.ToString()).SendAsync("Disconnect");
-            Context.Abort();
             await base.OnDisconnectedAsync(exception);
         }
 
@@ -47,23 +47,26 @@ namespace Fifth.Services
                 await HandleMoveRequest(game, posIndex);
         }
 
-        public async Task GetPlayersRequest()
+        public async Task GetPlayersInfoRequest()
         {
             int gameId = GetCurrentGameId();
             var game = await gamesCrudService.GetGameAsync(gameId);
-            //`````````````````
+            if (!game.IsAlive())
+                return;
+            var players = game.GameInstance.GetPlayers();
+            await Clients.Caller.SendAsync("AcceptPlayersInfo", players);
         }
 
         private async Task TryStartGame(int gameId)
         {
-            Game game = await gamesCrudService.GetGameAsync(gameId);
+            GameSession game = await gamesCrudService.GetGameAsync(gameId);
             if (!game.IsAlive())
                 return;
             else
                 await HandleStartGameRequest(game);
         }
 
-        private async Task HandleStartGameRequest(Game game)
+        private async Task HandleStartGameRequest(GameSession game)
         {
             var res = await gameProccessManager.TryStartGameAsync(game);
             if (res)
@@ -73,7 +76,7 @@ namespace Fifth.Services
             }
         }
 
-        private async Task HandleMoveRequest(Game game, int index)
+        private async Task HandleMoveRequest(GameSession game, int index)
         {
             var res = game.GameInstance.MakeMove(index, Context.ConnectionId);
             if (res.MoveMaid)
@@ -90,11 +93,11 @@ namespace Fifth.Services
                 await Clients.Caller.SendAsync("Disconnect");
         }
 
-        private async Task AssignChars(Game game)
+        private async Task AssignChars(GameSession game)
         {
             var starter = game.GameInstance.CurrentPlayer;
-            await Clients.GroupExcept(game.GameInstance.Id, starter).SendAsync("AcceptChar", "o");
-            await Clients.Client(starter).SendAsync("AcceptChar", "x");
+            await Clients.GroupExcept(game.GameInstance.Id, starter.ConnectionId).SendAsync("AcceptChar", "o");
+            await Clients.Client(starter.ConnectionId).SendAsync("AcceptChar", "x");
         }
 
         private int GetCurrentGameId()

@@ -1,10 +1,9 @@
-﻿<div class="text-danger float-left ml-2 mt-2">
-    <h2 id="me">
-        @User.Identity.Name
+﻿<div name="userName" class="text-danger float-left ml-2 mt-2">
+    <h2>
     </h2>
 </div>
-<div class="text-danger float-right mr-2 mt-2">
-    <h2 id="opponent">
+<div name="userName" class="text-danger float-right mr-2 mt-2">
+    <h2>
     </h2>
 </div>
 <div class="game-board position-fixed" id='gameboard'>
@@ -22,6 +21,9 @@
         </div>
     </div>
 </div>
+<button id="test">
+    test
+</button>
 
 @section Scripts{
     <script @*src="~/js/game.js"*@>
@@ -35,6 +37,7 @@
         const goHome = () => window.location.replace(homeUrl);
         const setCharToCell = (index, elem) => $(`#gameboard #${index}`).append(elem);
         const getElemId = elem => $(elem).attr('id');
+        const userNameElems = $('div[name="userName"] h2');
 
         disableField();
     </script>
@@ -45,14 +48,28 @@
 
         let myChar;
         let isMyMove = false;
+        $('#test').click(e => {
+            e.preventDefault();
+            alert("clecked")
+            hubConnection.invoke("GetPlayersInfoRequest");
+        })
 
         hubConnection.on("OnPlayerEntered", function (userName, id) {
-            $('#opponent').text(userName);
-             console.log(`$User: ${userName} ConnectionId: ${id}`);
+            console.log(`$User: ${userName} ConnectionId: ${id}`);
+            hubConnection.invoke("GetPlayersInfoRequest");
         });
 
         hubConnection.on("Disconnect", () => {
             goHome();
+        });
+
+        hubConnection.on("AcceptPlayersInfo", (players) => {
+            for (var i = 0; i < players.length; i++) {
+                if (!$(userNameElems[i]).attr("data-id")) {
+                    $(userNameElems[i]).attr("data-id", players[i].connectionId)
+                    $(userNameElems[i]).text(players[i].userName);
+                }
+            }
         });
 
         hubConnection.on("OnGameStarted", data => {

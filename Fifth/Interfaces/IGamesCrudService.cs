@@ -8,12 +8,12 @@ namespace Fifth.Interfaces
     {
         Task<int> CreateAsync(string gameName, User userCreator);
 
-        Task UpdateAsync(Game game);
+        Task UpdateAsync(GameSession game);
 
         Task DeleteAsync(int id);
 
-        Task<Game> GetGameAsync(int id);
+        Task<GameSession> GetGameAsync(int id);
 
-        Task<IEnumerable<Game>> GetAllGamesAsync();
+        Task<IEnumerable<GameSession>> GetAllGamesAsync();
     }
 }

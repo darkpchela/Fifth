@@ -15,6 +15,6 @@ namespace Fifth.Interfaces
 
         Task<IList<GameSessionVM>> GetOpenedGamesAsync();
 
-        Task<bool> TryStartGameAsync(Game game);
+        Task<bool> TryStartGameAsync(GameSession game);
     }
 }

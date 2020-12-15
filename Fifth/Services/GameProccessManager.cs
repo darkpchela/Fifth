@@ -44,13 +44,13 @@ namespace Fifth.Services
             if (!game.IsAlive())
                 return false;
             var user = await userCrudService.GetByLoginAsync(login);
-            var res = game.RegistPlayer(connectionId, user);
+            var res = game.GameInstance.RegistPlayer(connectionId, user);
             return res;
         }
 
-        public async Task<bool> TryStartGameAsync(Game game)
+        public async Task<bool> TryStartGameAsync(GameSession game)
         {
-            if (!game.IsAlive() || !game.IsReadyToStart)
+            if (!game.IsAlive() || !game.GameInstance.IsReadyToStart)
                 return false;
             game.Start();
             await gamesCrudService.UpdateAsync(game);

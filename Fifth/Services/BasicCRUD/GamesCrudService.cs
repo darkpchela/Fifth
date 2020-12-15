@@ -20,12 +20,12 @@ namespace Fifth.Services
             SessionData gameData = new SessionData(gameName, userCreator);
             unitOfWork.DbContext.Sessions.Add(gameData);
             await unitOfWork.DbContext.SaveChangesAsync();
-            Game game = new Game(gameData);
+            GameSession game = new GameSession(gameData);
             await unitOfWork.GamesStore.Create(game.GameInstance);
             return game.GameData.Id;
         }
 
-        public async Task UpdateAsync(Game game)
+        public async Task UpdateAsync(GameSession game)
         {
             unitOfWork.DbContext.Entry(game.GameData).State = EntityState.Modified;
             await unitOfWork.DbContext.SaveChangesAsync();
@@ -41,21 +41,21 @@ namespace Fifth.Services
             await unitOfWork.DbContext.SaveChangesAsync();
         }
 
-        public async Task<Game> GetGameAsync(int id)
+        public async Task<GameSession> GetGameAsync(int id)
         {
             var gameData = await unitOfWork.DbContext.Sessions.FindAsync(id);
             var gameInstance = await unitOfWork.GamesStore.Get(id);
-            var game = new Game(gameData, gameInstance);
+            var game = new GameSession(gameData, gameInstance);
             return game;
         }
 
-        public async Task<IEnumerable<Game>> GetAllGamesAsync()
+        public async Task<IEnumerable<GameSession>> GetAllGamesAsync()
         {
-            var games = new List<Game>();
+            var games = new List<GameSession>();
             foreach (var gd in unitOfWork.DbContext.Sessions)
             {
                 var gi = await GetGameInstance(gd.Id);
-                games.Add(new Game(gd, gi));
+                games.Add(new GameSession(gd, gi));
             }
             return games;
         }
