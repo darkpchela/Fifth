@@ -66,7 +66,7 @@ namespace Fifth.Services
 
         public async Task<IList<GameSessionVM>> GetOpenedGamesAsync()
         {
-            var openedSessions = unitOfWork.DbContext.GameInfoDatas.Where(g => !g.Started).Include(t => t.Creator);
+            var openedSessions = unitOfWork.DbContext.Sessions.Where(g => !g.Started).Include(t => t.Creator);
             var VMs = mapper.ProjectTo<GameSessionVM>(openedSessions);
             return await VMs.ToListAsync();
         }

@@ -5,11 +5,12 @@ using System.Collections.Generic;
 
 namespace Fifth.Models
 {
-    public partial class SessionTag
+    public partial class UserSession
     {
+        public int UserId { get; set; }
         public int SessionId { get; set; }
-        public int TagId { get; set; }
 
         public virtual SessionData Session { get; set; }
+        public virtual SessionData User { get; set; }
     }
 }

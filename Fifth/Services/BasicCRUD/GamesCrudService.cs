@@ -17,8 +17,8 @@ namespace Fifth.Services
 
         public async Task<int> CreateAsync(string gameName, User userCreator)
         {
-            GameData gameData = new GameData(gameName, userCreator);
-            unitOfWork.DbContext.GameInfoDatas.Add(gameData);
+            SessionData gameData = new SessionData(gameName, userCreator);
+            unitOfWork.DbContext.Sessions.Add(gameData);
             await unitOfWork.DbContext.SaveChangesAsync();
             Game game = new Game(gameData);
             await unitOfWork.GamesStore.Create(game.GameInstance);
@@ -33,17 +33,17 @@ namespace Fifth.Services
 
         public async Task DeleteAsync(int gameId)
         {
-            var gameData = await unitOfWork.DbContext.GameInfoDatas.FirstOrDefaultAsync(d => d.Id == gameId);
+            var gameData = await unitOfWork.DbContext.Sessions.FirstOrDefaultAsync(d => d.Id == gameId);
             await unitOfWork.GamesStore.Delete(gameId);
             if (gameData is null)
                 return;
-            unitOfWork.DbContext.GameInfoDatas.Remove(gameData);
+            unitOfWork.DbContext.Sessions.Remove(gameData);
             await unitOfWork.DbContext.SaveChangesAsync();
         }
 
         public async Task<Game> GetGameAsync(int id)
         {
-            var gameData = await unitOfWork.DbContext.GameInfoDatas.FindAsync(id);
+            var gameData = await unitOfWork.DbContext.Sessions.FindAsync(id);
             var gameInstance = await unitOfWork.GamesStore.Get(id);
             var game = new Game(gameData, gameInstance);
             return game;
@@ -52,7 +52,7 @@ namespace Fifth.Services
         public async Task<IEnumerable<Game>> GetAllGamesAsync()
         {
             var games = new List<Game>();
-            foreach (var gd in unitOfWork.DbContext.GameInfoDatas)
+            foreach (var gd in unitOfWork.DbContext.Sessions)
             {
                 var gi = await GetGameInstance(gd.Id);
                 games.Add(new Game(gd, gi));

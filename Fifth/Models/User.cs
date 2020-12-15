@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -8,13 +9,13 @@ namespace Fifth.Models
     {
         public User()
         {
-            GameSessions = new HashSet<GameData>();
+            Sessions = new HashSet<SessionData>();
         }
 
         public int Id { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
 
-        public virtual ICollection<GameData> GameSessions { get; set; }
+        public virtual ICollection<SessionData> Sessions { get; set; }
     }
 }

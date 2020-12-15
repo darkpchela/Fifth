@@ -1,6 +1,6 @@
 ﻿using Fifth.Interfaces;
 
-namespace Fifth.Services
+namespace Fifth.Services.DataContext
 {
     public class UnitOfWork : IUnitOfWork
     {

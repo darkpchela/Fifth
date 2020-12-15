@@ -4,15 +4,15 @@
     {
         public GameInstance GameInstance { get; }
 
-        public GameData GameData { get; }
+        public SessionData GameData { get; }
 
-        public Game(GameData gameData)
+        public Game(SessionData gameData)
         {
             this.GameData = gameData;
             this.GameInstance = new GameInstance(gameData.Id.ToString());
         }
 
-        public Game(GameData gameData, GameInstance gameInstance)
+        public Game(SessionData gameData, GameInstance gameInstance)
         {
             this.GameData = gameData;
             this.GameInstance = gameInstance;

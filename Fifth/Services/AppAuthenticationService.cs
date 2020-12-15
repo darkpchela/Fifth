@@ -1,5 +1,6 @@
 ﻿using Fifth.Interfaces;
 using Fifth.Models;
+using Fifth.Services.DataContext;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;

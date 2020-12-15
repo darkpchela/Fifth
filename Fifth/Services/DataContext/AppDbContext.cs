@@ -1,9 +1,11 @@
-﻿using Fifth.Models;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Fifth.Models;
 
 #nullable disable
 
-namespace Fifth.Services
+namespace Fifth.Services.DataContext
 {
     public partial class AppDbContext : DbContext
     {
@@ -16,16 +18,17 @@ namespace Fifth.Services
         {
         }
 
-        public virtual DbSet<GameData> GameInfoDatas { get; set; }
+        public virtual DbSet<SessionData> Sessions { get; set; }
         public virtual DbSet<SessionTag> SessionTags { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserSession> UserSessions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("name=Default");
+                optionsBuilder.UseSqlServer("name=default");
             }
         }
 
@@ -33,10 +36,12 @@ namespace Fifth.Services
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Cyrillic_General_CI_AS");
 
-            modelBuilder.Entity<GameData>(entity =>
+            modelBuilder.Entity<SessionData>(entity =>
             {
+                entity.HasIndex(e => e.CreatorId, "IX_GameInfoDatas_CreatorId");
+
                 entity.HasOne(d => d.Creator)
-                    .WithMany(p => p.GameSessions)
+                    .WithMany(p => p.Sessions)
                     .HasForeignKey(d => d.CreatorId)
                     .HasConstraintName("FK_GameSessions_To_Users");
             });
@@ -44,6 +49,8 @@ namespace Fifth.Services
             modelBuilder.Entity<SessionTag>(entity =>
             {
                 entity.HasNoKey();
+
+                entity.HasIndex(e => e.SessionId, "IX_SessionTags_SessionId");
 
                 entity.HasOne(d => d.Session)
                     .WithMany()
@@ -74,6 +81,24 @@ namespace Fifth.Services
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasMaxLength(32);
+            });
+
+            modelBuilder.Entity<UserSession>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("UserSession");
+
+                entity.HasOne(d => d.Session)
+                    .WithMany()
+                    .HasForeignKey(d => d.SessionId)
+                    .HasConstraintName("FK_UserSession_To_Session");
+
+                entity.HasOne(d => d.User)
+                    .WithMany()
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UserSession_To_Users");
             });
 
             OnModelCreatingPartial(modelBuilder);
