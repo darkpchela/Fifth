@@ -1,0 +1,23 @@
+﻿@model CreateGameVM
+
+<form id="createForm" asp-action="CreateGame" method="post">
+    <div class="modal-body d-flex flex-column justify-content-center">
+        <div class="text-center p-2">
+            <h5>
+                <label>Game name:</label>
+            </h5>
+            <input id='name' type="text" asp-for="Name" class="bg-dark text-warning form-control" />
+        </div>
+        <div class="p-2">
+            <h5 class="text-center">
+                <label class="w-25">Edit tags:</label>
+            </h5>
+            <input id="tagsInput" asp-for="Tags" class="bg-dark text-warning text-monospace col-8 offset-2" />
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="btnCreate" type="button" class="btn text-warning bg-dark btn-lg" rel="modal:close">Create</button>
+        <a href="#" class="btn text-warning bg-dark btn-lg " rel="modal:close">Close</a>
+    </div>
+</form>
+<div asp-validation-summary="All"></div>

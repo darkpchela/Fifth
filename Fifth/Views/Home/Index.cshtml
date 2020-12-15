@@ -23,13 +23,12 @@
     </div>
 </div>
 
-<div class="col-8 offset-2">
-    @{ await Html.RenderPartialAsync("_GamesTable");}
+<div id="gamesTable" class="col-8 offset-2">
 </div>
 
 <div id="modal" class="modal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered text-warning">
-        <div class="modal-content bg-secondary border border-warning rounded">
+        <div id="modalContent" class="modal-content bg-secondary border border-warning rounded">
             <div class="modal-header">
                 <h4 class="modal-title">New game</h4>
                 <a href="#" class="btn text-white bg-dark btn-lg close" rel="modal:close"
@@ -37,26 +36,7 @@
             </div>
             @if (User.Identity.IsAuthenticated)
             {
-                <form asp-action="CreateGame" method="post">
-                    <div class="modal-body d-flex flex-column justify-content-center">
-                        <div class="text-center p-2">
-                            <h5>
-                                <label>Game name:</label>
-                            </h5>
-                            <input id='name' type="text" asp-for="Name" class="bg-dark text-warning form-control" />
-                        </div>
-                        <div class="p-2">
-                            <h5 class="text-center">
-                                <label class="w-25">Edit tags:</label>
-                            </h5>
-                            <input id="tagsInput" asp-for="Tags" class="bg-dark text-warning text-monospace col-8 offset-2" />
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn text-warning bg-dark btn-lg" rel="modal:close">Create</button>
-                        <a href="#" class="btn text-warning bg-dark btn-lg " rel="modal:close">Close</a>
-                    </div>
-                </form>
+                await Html.RenderPartialAsync("_CreateGame");
             }
             else
             {
@@ -81,7 +61,57 @@
     <script src="~/lib/tagify/tagify.min.js"></script>
     <script src="~/lib/tagify/jQuery.tagify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-    <script src="~/js/index.js"></script>
+    <script @*src="~/js/index.js"*@>
+        //const updateReferences = () => {
+
+        //    $('#newGame').click((e) => {
+        //        e.preventDefault();
+        //        $('#modal').modal('show');
+        //    })
+        //}
+    </script>
+    <script>
+
+
+
+        const goToGame = id => window.replace(`Home/Game/${id}`)
+
+        const updateTable = () => {
+            $.ajax({
+                type: "GET",
+                url: "Home/_GamesTable",
+                success: data => {
+                    $('#gamesTable').empty();
+                    $('#gamesTable').append(data);
+                    $('#newGame').click((e) => {
+                        e.preventDefault();
+                        $('#modal').modal('show');
+                    });
+                }
+            });
+        };
+
+        $(updateTable());
+
+        $('#btnCreate').click(e => {
+            e.preventDefault();
+            let data = $('#createForm').serialize();
+            $.ajax({
+                type: "post",
+                url: "Home/CreateGame",
+                data: data,
+                success: data => {
+                    if (data.id != undefined) {
+                        $('#modal').modal('close')
+                    }
+                    else {
+                        $('#modalContent').empty();
+                        $('#modalContent').append(data);
+                    }
+                }
+            });
+        })
+    </script>
     <script>
         function addCard(data) {
             let cardElem = $('#cardPrototype').clone();

@@ -11,10 +11,3 @@
     }
 });
 
-$('#newGame').click((e) => {
-    e.preventDefault();
-    $('#modal').modal('show');
-})
-
-
-
