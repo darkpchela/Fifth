@@ -84,7 +84,7 @@ namespace Fifth.Services
 
         private async Task TryEnterGame(int gameId)
         {
-            var res = await gameProccessManager.TryEnterGameAsync(Context.ConnectionId, gameId);
+            var res = await gameProccessManager.TryEnterGameAsync(Context.ConnectionId, Context.User.Identity.Name, gameId);
             await Clients.Group(gameId.ToString()).SendAsync("OnPlayerEntered", Context.GetHttpContext().User.Identity.Name, Context.ConnectionId, res);
             if (!res)
                 await Clients.Caller.SendAsync("Disconnect");

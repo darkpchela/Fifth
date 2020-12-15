@@ -22,13 +22,12 @@ namespace Fifth.Services.DataContext
         public virtual DbSet<SessionTag> SessionTags { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<UserSession> UserSessions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("name=default");
+                optionsBuilder.UseSqlServer("name=Default");
             }
         }
 
@@ -81,24 +80,6 @@ namespace Fifth.Services.DataContext
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasMaxLength(32);
-            });
-
-            modelBuilder.Entity<UserSession>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToTable("UserSession");
-
-                entity.HasOne(d => d.Session)
-                    .WithMany()
-                    .HasForeignKey(d => d.SessionId)
-                    .HasConstraintName("FK_UserSession_To_Session");
-
-                entity.HasOne(d => d.User)
-                    .WithMany()
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserSession_To_Users");
             });
 
             OnModelCreatingPartial(modelBuilder);

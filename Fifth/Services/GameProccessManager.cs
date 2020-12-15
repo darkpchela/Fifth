@@ -22,7 +22,8 @@ namespace Fifth.Services
 
         private readonly IMapper mapper;
 
-        public GameProccessManager(IHubContext<MainHub> hubContext, IMapper mapper, IGamesCrudService gamesCrudService, IUnitOfWork unitOfWork, IUserCrudService userCrudService)
+        public GameProccessManager(IHubContext<MainHub> hubContext, IMapper mapper, IGamesCrudService gamesCrudService, 
+            IUnitOfWork unitOfWork, IUserCrudService userCrudService)
         {
             this.hubContext = hubContext;
             this.unitOfWork = unitOfWork;
@@ -37,18 +38,19 @@ namespace Fifth.Services
             OnGameStartedOrClosed(id);
         }
 
-        public async Task<bool> TryEnterGameAsync(string connectionId, int gameId)
+        public async Task<bool> TryEnterGameAsync(string connectionId, string login, int gameId)
         {
             var game = await gamesCrudService.GetGameAsync(gameId);
             if (!game.IsAlive())
                 return false;
-            var res = game.GameInstance.RegistPlayer(connectionId);
+            var user = await userCrudService.GetByLoginAsync(login);
+            var res = game.RegistPlayer(connectionId, user);
             return res;
         }
 
         public async Task<bool> TryStartGameAsync(Game game)
         {
-            if (!game.IsAlive() || !game.GameInstance.IsReadyToStart)
+            if (!game.IsAlive() || !game.IsReadyToStart)
                 return false;
             game.Start();
             await gamesCrudService.UpdateAsync(game);
@@ -56,7 +58,7 @@ namespace Fifth.Services
             return true;
         }
 
-        public async Task<int> CreateGameAsync(CreateGameVM createGameVM)
+        public async Task<int> OpenGameAsync(CreateGameVM createGameVM)
         {
             var user = await userCrudService.GetByLoginAsync(createGameVM.Username);
             var gameId = await gamesCrudService.CreateAsync(createGameVM.Name, user);

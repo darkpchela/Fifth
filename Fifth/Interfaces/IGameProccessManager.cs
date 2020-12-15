@@ -7,11 +7,11 @@ namespace Fifth.Interfaces
 {
     public interface IGameProccessManager
     {
-        Task<int> CreateGameAsync(CreateGameVM createGameVM);
+        Task<int> OpenGameAsync(CreateGameVM createGameVM);
 
         Task CloseGameAsync(int id);
 
-        Task<bool> TryEnterGameAsync(string connectionId, int gameId);
+        Task<bool> TryEnterGameAsync(string connectionId, string userName, int gameId);
 
         Task<IList<GameSessionVM>> GetOpenedGamesAsync();
 

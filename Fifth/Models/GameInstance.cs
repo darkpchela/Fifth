@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Fifth.Models
 {
@@ -11,22 +12,20 @@ namespace Fifth.Models
 
         private int[] map = new int[9];
 
-        private List<string> players = new List<string>();
+        private IList<string> players;
 
         public string Id { get; }
 
         public string CurrentPlayer { get; private set; }
-
-        public bool IsReadyToStart { get; private set; }
 
         public GameInstance(string id)
         {
             this.Id = id;
         }
 
-        public MoveResult MakeMove(int postion, string player)
+        public MoveResult MakeMove(int postion, string connectionId)
         {
-            if (player != CurrentPlayer || postion < 0 || postion > 8 || map[postion] != 0 || movesCount >= 9)
+            if (connectionId != CurrentPlayer || postion < 0 || postion > 8 || map[postion] != 0 || movesCount >= 9)
                 return new MoveResult(false);
             map[postion] = moveValue;
             SwapMoveValue();
@@ -38,26 +37,12 @@ namespace Fifth.Models
         }
 
 
-        public void StartGame()
+        public void StartGame(IList<string> connections)
         {
+            players = connections;
             Random rnd = new Random();
             var index = rnd.Next(0, 2);
             CurrentPlayer = players[index];
-        }
-
-        public bool RegistPlayer(string connectionId)
-        {
-            if (players.Count >= 2)
-                return false;
-            players.Add(connectionId);
-            if (players.Count == 2)
-                IsReadyToStart = true;
-            return true;
-        }
-
-        public void KickPlayer(string connectionId)
-        {
-            players.Remove(connectionId);
         }
 
         private void SwapMoveValue()

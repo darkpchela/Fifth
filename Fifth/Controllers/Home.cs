@@ -46,7 +46,7 @@ namespace Fifth.Controllers
         {
             createGameVM.Username = HttpContext.User.Identity.Name;
             //var a = JsonConvert.DeserializeObject<Tag[]>(createGameVM.Tags);
-            int id = await gameManageService.CreateGameAsync(createGameVM);
+            int id = await gameManageService.OpenGameAsync(createGameVM);
             return RedirectToAction(nameof(Game), new { id = id });
         }
 
