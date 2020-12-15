@@ -1,8 +1,8 @@
-﻿<div name="userName" class="text-danger float-left ml-2 mt-2">
+﻿<div name="userName" class="text-white-50 float-left ml-2 mt-2">
     <h2>
     </h2>
 </div>
-<div name="userName" class="text-danger float-right mr-2 mt-2">
+<div name="userName" class="text-white-50 float-right mr-2 mt-2">
     <h2>
     </h2>
 </div>
@@ -38,6 +38,7 @@
         const setCharToCell = (index, elem) => $(`#gameboard #${index}`).append(elem);
         const getElemId = elem => $(elem).attr('id');
         const userNameElems = $('div[name="userName"] h2');
+        const turnOffOnSuccess = (elem) => elem.hasClass("text-success") ? elem.removeClass("text-success") : elem.addClass("text-success");
 
         disableField();
     </script>
@@ -48,10 +49,13 @@
 
         let myChar;
         let isMyMove = false;
+        let myConnectionId;
+
         $('#test').click(e => {
             e.preventDefault();
             alert("clecked")
             hubConnection.invoke("GetPlayersInfoRequest");
+            swapUsernameClass(myConnectionId);
         })
 
         hubConnection.on("OnPlayerEntered", function (userName, id) {
@@ -63,6 +67,10 @@
             goHome();
         });
 
+        hubConnection.on("AcceptConnectionId", id => {
+            myConnectionId = id;
+        })
+
         hubConnection.on("AcceptPlayersInfo", (players) => {
             for (var i = 0; i < players.length; i++) {
                 if (!$(userNameElems[i]).attr("data-id")) {
@@ -73,12 +81,10 @@
         });
 
         hubConnection.on("OnGameStarted", data => {
+            alert("Game Started")
             if (isMyMove) {
-                $('#gameboard button').prop("disabled", false);
-                $('#me').addClass("text-success")
-            }
-            else {
-                $('#opponent').addClass("text-success")
+                turnOffOnSuccess($(`h2[data-id=${myConnectionId}]`));
+                enableField();
             }
         });
 
@@ -92,11 +98,14 @@
                 enableField();
                 myChar == "o" ? setCharToCell(index, crossElem) : setCharToCell(index, circleElem);
             }
+            turnOffOnSuccess($(`h2[data-id=${myConnectionId}]`));
+            turnOffOnSuccess($(`h2[data-id!=${myConnectionId}]`));
             isMyMove = !isMyMove;
         });
 
         hubConnection.on("AcceptChar", char => {
             myChar = char;
+            alert(myChar)
             if (myChar == "x")
                 isMyMove = true;
         });

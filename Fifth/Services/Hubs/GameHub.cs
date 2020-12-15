@@ -26,6 +26,7 @@ namespace Fifth.Services
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
             await TryEnterGame(gameId);
             await TryStartGame(gameId);
+            await Clients.Caller.SendAsync("AcceptConnectionId", Context.ConnectionId);
             await base.OnConnectedAsync();
         }
 
