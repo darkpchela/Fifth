@@ -2,7 +2,6 @@
     ViewData["Title"] = "Main Page";
 }
 @inject Fifth.Interfaces.ITagCrudService tagsService
-@model GameSessionVM
 <div class="col-2 float-left">
     <div class="text-center">
         <h3 class="text-monospace text-warning">Tags</h3>
@@ -12,7 +11,7 @@
             <a id="tagPrototype" href="#" data-selected="0"  class="tag" hidden></a>
             @foreach (var item in await tagsService.GetAll())
             {
-            <a href="#" data-selected="0" class="tag">#@item.Value</a>
+            <a href="#" data-selected="0" data-id="@item.Id" data-value="@item.Value" class="tag">#@item.Value</a>
             }
         </div>
     </div>
@@ -92,7 +91,22 @@
                 $(e.target).appendTo($('#tagsCloud'));
                 e.target.setAttribute('data-selected', 0);
             }
+            let tags = JSON.stringify(getFilterTags());
+            updateTableAjax(tags);
         });
+
+        const getFilterTags = () => {
+            let elems = $('#tagsFilter a');
+            let tags = [];
+            for (let i = 0; i < elems.length; i++) {
+                let tag = {
+                    id: $(elems[i]).data('id'),
+                    value: $(elems[i]).data('value')
+                };
+                tags.push(tag);
+            }
+            return tags;
+        };
 
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
@@ -132,10 +146,11 @@
             });
         }
 
-        const updateTableAjax = () => {
+        const updateTableAjax = (tags) => {
             $.ajax({
-                type: "GET",
+                type: "POST",
                 url: "Home/_GamesTable",
+                data: { "tagsJson" : tags },
                 success: data => {
                     $('#gamesTable').empty();
                     $('#gamesTable').append(data);

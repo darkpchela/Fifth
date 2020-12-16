@@ -44,7 +44,7 @@ namespace Fifth.Controllers
             return View();
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> _GamesTable(string tagsJson)
         {
             List<SessionData> sessions;

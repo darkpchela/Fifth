@@ -54,7 +54,7 @@ namespace Fifth.Services.BasicCRUD
             var sessionTags = unitOfWork.DbContext.SessionTags.AsNoTracking();
             foreach (int id in tagIds)
             {
-                sessionTags = sessionTags.Where(st => tagIds.Contains(st.Id));
+                sessionTags = sessionTags.Where(st => st.TagId == id);
             }
             var sessions = sessionTags.Include(e => e.Session).Select(r => r.Session);
             return await sessions.ToListAsync();
