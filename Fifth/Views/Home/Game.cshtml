@@ -117,11 +117,15 @@
         hubConnection.on("OnGameStarted", data => {
             showStartModal();
             if (isMyMove) {
+                alert("myMove")
                 turnOffOnSuccess($(`h2[data-id=${myConnectionId}]`));
                 enableField();
             }
-            else
+            else {
+                alert("not my move")
                 turnOffOnSuccess($(`h2[data-id!=${myConnectionId}]`));
+            }
+            alert(myConnectionId)
         });
 
         hubConnection.on("OnMoveMaid", index => {

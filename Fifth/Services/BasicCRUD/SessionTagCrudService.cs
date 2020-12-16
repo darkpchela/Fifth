@@ -52,12 +52,27 @@ namespace Fifth.Services.BasicCRUD
         public async Task<IEnumerable<SessionData>> GetSessionsByTagAsync(IEnumerable<int> tagIds)
         {
             var sessionTags = unitOfWork.DbContext.SessionTags.AsNoTracking();
-            foreach (int id in tagIds)
+            var session = unitOfWork.DbContext.SessionTags.Select(s => s.Session);
+            foreach (var id in tagIds)
             {
-                sessionTags = sessionTags.Where(st => st.TagId == id);
+                var s = sessionTags.Where(st => st.TagId == id).Select(s => s.Session);
+                session = session.Intersect(s);
             }
-            var sessions = sessionTags.Include(e => e.Session).Select(r => r.Session);
-            return await sessions.ToListAsync();
+            //var grouped = sessionTags
+            //    .Select(st => new
+            //    {
+            //        id = st.SessionId,
+            //        tag = st.TagId,
+            //        session = st.Session
+            //    })
+            //    .GroupBy(n => n.id)
+            //    .Where(g => tagIds.Except(g.Select(g => g.tag)).Count() == 0);
+            //var session = new List<SessionData>();
+            //foreach (var g in grouped)
+            //{
+            //    g.
+            //}
+            return await session.ToListAsync();
         }
     }
 }
