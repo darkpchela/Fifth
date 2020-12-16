@@ -15,12 +15,14 @@ namespace Fifth.Controllers
     public class Home : Controller
     {
         private readonly IGameProccessManager gameManageService;
+        private readonly ITagCrudService tagCrudService;
         private readonly IAppAuthenticationService authenticationService;
 
-        public Home(IGameProccessManager gameManageService, IAppAuthenticationService authenticationService)
+        public Home(IGameProccessManager gameManageService, IAppAuthenticationService authenticationService, ITagCrudService tagCrudService)
         {
             this.gameManageService = gameManageService;
             this.authenticationService = authenticationService;
+            this.tagCrudService = tagCrudService;
         }
 
         public IActionResult Index()
@@ -37,6 +39,13 @@ namespace Fifth.Controllers
         public IActionResult _GamesTable(string tagsGET)
         {
             return PartialView();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTags()
+        {
+            var tags = await tagCrudService.GetAll();
+            return Json(tags);
         }
 
         [Authorize]

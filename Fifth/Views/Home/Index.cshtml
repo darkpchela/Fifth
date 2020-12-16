@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Main Page";
 }
+@inject Fifth.Interfaces.ITagCrudService tagsService
 @model GameSessionVM
 <div class="col-2 float-left">
     <div class="text-center">
@@ -8,7 +9,11 @@
     </div>
     <div class="p-2  tags-cloud bg-secondary border border-warning rounded">
         <div id="tagsCloud" class="d-flex flex-row flex-wrap justify-content-center">
-            <a href="" data-selected="0" class="tag">#tag</a>
+            <a id="tagPrototype" href="#" data-selected="0"  class="tag" hidden></a>
+            @foreach (var item in await tagsService.GetAll())
+            {
+            <a href="#" data-selected="0" class="tag">#@item.Value</a>
+            }
         </div>
     </div>
 </div>
@@ -60,6 +65,36 @@
 @section Scripts{
     <script src="~/lib/tagify/tagify.min.js"></script>
     <script src="~/lib/tagify/jQuery.tagify.min.js"></script>
+    <script>
+        let tagify;
+        let input = document.querySelector('#tagsInput');
+        if (input) {
+            tagify = new Tagify(input, {
+                whitelist: [],
+                maxTags: 10,
+                dropdown: {
+                    maxItems: 20,
+                    classname: "tags-look",
+                    enabled: 0,
+                    closeOnSelect: false
+                }
+            })
+        }
+
+        $('#tagsCloud a, #tagsFilter a').click((e) => {
+            e.preventDefault();
+            let selected = $(e.target).attr('data-selected');
+            if (selected == 0) {
+                $(e.target).appendTo($('#tagsFilter'))
+                e.target.setAttribute('data-selected', 1)
+            }
+            else {
+                $(e.target).appendTo($('#tagsCloud'));
+                e.target.setAttribute('data-selected', 0);
+            }
+        });
+
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <script @*src="~/js/index.js"*@>
         const updateNewGameRef = () => {
@@ -87,6 +122,26 @@
                 }
             });
         }
+        const getTagsAjax = () => {
+            $.ajax({
+                type: "GET",
+                url: "Home/GetTags",
+                success: data => {
+                    console.log(data)
+                    alert(data.length)
+                    tagify.settings.whitelist.splice(0, data.length, ...data);
+                }
+            });
+        }
+
+        //const updateTagsCloud = () => {
+
+        //    let tags = getTagsAjax();
+        //    for (var i = 0; i < tags.length; i++) {
+
+        //    }
+        //};
+
         const updateTableAjax = () => {
             $.ajax({
                 type: "GET",
@@ -107,6 +162,7 @@
         $(updateTableAjax());
         $(updateCreateGameRef());
         $(updateNewGameRef());
+        $(getTagsAjax());
     </script>
     <script>
         function addCard(data) {
@@ -142,35 +198,5 @@
 
         hubConnection.start();
     </script>
-<script>
-    let tagify;
-    let input = document.querySelector('#tagsInput');
-    if (input) {
-        tagify = new Tagify(input, {
-            whitelist: [],
-            maxTags: 10,
-            dropdown: {
-                maxItems: 20,           
-                classname: "tags-look", 
-                enabled: 0,             
-                closeOnSelect: false    
-            }
-        })
-        tagify.settings.whitelist.splice(0, 2, { value: 'a', id: 0 }, 'b');
-    }
 
-    $('#tagsCloud a, #tagsFilter a').click((e) => {
-        e.preventDefault();
-        let selected = $(e.target).attr('data-selected');
-        if (selected == 0) {
-            $(e.target).appendTo($('#tagsFilter'))
-            e.target.setAttribute('data-selected', 1)
-        }
-        else {
-            $(e.target).appendTo($('#tagsCloud'));
-            e.target.setAttribute('data-selected', 0);
-        }
-    });
-
-</script>
 }
