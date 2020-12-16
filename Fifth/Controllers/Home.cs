@@ -9,6 +9,8 @@ using System.Text.Json;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Fifth.Models;
+using System.Linq;
+using AutoMapper;
 
 namespace Fifth.Controllers
 {
@@ -17,12 +19,19 @@ namespace Fifth.Controllers
         private readonly IGameProccessManager gameManageService;
         private readonly ITagCrudService tagCrudService;
         private readonly IAppAuthenticationService authenticationService;
+        private readonly ISessionTagCrudService sessionTagCrudService;
+        private readonly IGamesCrudService gamesCrudService;
+        private readonly IMapper mapper;
 
-        public Home(IGameProccessManager gameManageService, IAppAuthenticationService authenticationService, ITagCrudService tagCrudService)
+        public Home(IGameProccessManager gameManageService, IAppAuthenticationService authenticationService, ITagCrudService tagCrudService, ISessionTagCrudService sessionTagCrudService,
+            IGamesCrudService gamesCrudService ,IMapper mapper)
         {
             this.gameManageService = gameManageService;
             this.authenticationService = authenticationService;
             this.tagCrudService = tagCrudService;
+            this.sessionTagCrudService = sessionTagCrudService;
+            this.gamesCrudService = gamesCrudService;
+            this.mapper = mapper;
         }
 
         public IActionResult Index()
@@ -36,9 +45,18 @@ namespace Fifth.Controllers
         }
 
         [HttpGet]
-        public IActionResult _GamesTable(string tagsGET)
+        public async Task<IActionResult> _GamesTable(string tagsJson)
         {
-            return PartialView();
+            List<SessionData> sessions;
+            if (string.IsNullOrEmpty(tagsJson))
+                sessions = (await gamesCrudService.GetAllGamesAsync()).Select(g => g.GameData).Where(g => !g.Started).ToList();
+            else
+            {
+                var inputTags = JsonConvert.DeserializeObject<Tag[]>(tagsJson).Select(t => t.Id);
+                sessions = (await sessionTagCrudService.GetSessionsByTagAsync(inputTags)).ToList();
+            }
+            var VMs = mapper.Map<IEnumerable<GameSessionVM>>(sessions);
+            return PartialView(VMs);
         }
 
         [HttpGet]
@@ -72,11 +90,5 @@ namespace Fifth.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
-        //public class Tag
-        //{
-        //    public int? Id { get; set; }
-        //    public string Value { get; set; }
-        //}
     }
 }

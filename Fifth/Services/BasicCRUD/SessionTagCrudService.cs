@@ -29,16 +29,14 @@ namespace Fifth.Services.BasicCRUD
                     Session = sessionData,
                     TagId = tagId
                 };
-                try
-                {
                 unitOfWork.DbContext.SessionTags.Add(entity);
                 await unitOfWork.DbContext.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-
-                }
             }
+        }
+
+        public async Task<IQueryable<SessionTag>> GetAll()
+        {
+            return unitOfWork.DbContext.SessionTags.AsNoTracking();
         }
 
         public async Task<IEnumerable<Tag>> GetTagsBySessionAsync(int sessionId)
@@ -51,12 +49,15 @@ namespace Fifth.Services.BasicCRUD
             return tags.AsNoTracking();
         }
 
-        public async Task<IEnumerable<SessionData>> GetSessionsByTagAsync(int tagId)
+        public async Task<IEnumerable<SessionData>> GetSessionsByTagAsync(IEnumerable<int> tagIds)
         {
-            if (!await unitOfWork.DbContext.Tags.AnyAsync(t => t.Id == tagId))
-                return new List<SessionData>();
-            var sessions = unitOfWork.DbContext.SessionTags.Where(st => st.TagId == tagId).Include(e => e.Session).Select(r => r.Session);
-            return sessions;
+            var sessionTags = unitOfWork.DbContext.SessionTags.AsNoTracking();
+            foreach (int id in tagIds)
+            {
+                sessionTags = sessionTags.Where(st => tagIds.Contains(st.Id));
+            }
+            var sessions = sessionTags.Include(e => e.Session).Select(r => r.Session);
+            return await sessions.ToListAsync();
         }
     }
 }

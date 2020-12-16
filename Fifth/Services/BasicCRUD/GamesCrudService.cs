@@ -33,12 +33,13 @@ namespace Fifth.Services
 
         public async Task DeleteAsync(int gameId)
         {
-            var gameData = await unitOfWork.DbContext.Sessions.FirstOrDefaultAsync(d => d.Id == gameId);
+            var gameData = await unitOfWork.DbContext.Sessions.Include(t => t.Creator).FirstOrDefaultAsync(d => d.Id == gameId);
+            if (gameData != null)
+            {
+                unitOfWork.DbContext.Sessions.Remove(gameData);
+                unitOfWork.DbContext.SaveChanges();
+            }
             await unitOfWork.GamesStore.Delete(gameId);
-            if (gameData is null)
-                return;
-            unitOfWork.DbContext.Sessions.Remove(gameData);
-            await unitOfWork.DbContext.SaveChangesAsync();
         }
 
         public async Task<GameSession> GetGameAsync(int id)
@@ -52,7 +53,7 @@ namespace Fifth.Services
         public async Task<IEnumerable<GameSession>> GetAllGamesAsync()
         {
             var games = new List<GameSession>();
-            foreach (var gd in unitOfWork.DbContext.Sessions)
+            foreach (var gd in unitOfWork.DbContext.Sessions.Include(e => e.Creator))
             {
                 var gi = await GetGameInstance(gd.Id);
                 games.Add(new GameSession(gd, gi));

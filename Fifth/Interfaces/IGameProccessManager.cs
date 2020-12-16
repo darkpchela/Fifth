@@ -1,6 +1,5 @@
 ﻿using Fifth.Models;
 using Fifth.ViewModels;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Fifth.Interfaces
@@ -12,8 +11,6 @@ namespace Fifth.Interfaces
         Task CloseGameAsync(int id);
 
         Task<bool> TryEnterGameAsync(string connectionId, string userName, int gameId);
-
-        Task<IList<GameSessionVM>> GetOpenedGamesAsync();
 
         Task<bool> TryStartGameAsync(GameSession game);
     }

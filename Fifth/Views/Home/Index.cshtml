@@ -127,20 +127,10 @@
                 type: "GET",
                 url: "Home/GetTags",
                 success: data => {
-                    console.log(data)
-                    alert(data.length)
                     tagify.settings.whitelist.splice(0, data.length, ...data);
                 }
             });
         }
-
-        //const updateTagsCloud = () => {
-
-        //    let tags = getTagsAjax();
-        //    for (var i = 0; i < tags.length; i++) {
-
-        //    }
-        //};
 
         const updateTableAjax = () => {
             $.ajax({
@@ -187,7 +177,6 @@
 
         hubConnection.on("OnGameStartedOrClosed", id => {
             console.log(`Game ${id} closed!`);
-            alert($(`#gameCards div[data-id="${id}"]`).length);
             $(`#gameCards div[data-id="${id}"]`).remove();
         });
 

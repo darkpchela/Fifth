@@ -1,4 +1,4 @@
-﻿@inject Fifth.Interfaces.IGameProccessManager gameService
+﻿@model IEnumerable<GameSessionVM>
 
 <div class="text-center">
     <h3 class="text-monospace text-warning">Games</h3>
@@ -13,7 +13,7 @@
             </div>
         </div>
     </div>
-    @foreach (var g in  await gameService.GetOpenedGamesAsync())
+    @foreach (var g in  Model)
     {
         <div data-id="@g.Id" class="p-2">
             <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
