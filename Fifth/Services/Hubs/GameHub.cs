@@ -1,5 +1,4 @@
-﻿using Fifth.Extensions;
-using Fifth.Interfaces;
+﻿using Fifth.Interfaces;
 using Fifth.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
@@ -22,9 +21,9 @@ namespace Fifth.Services
         public async override Task OnConnectedAsync()
         {
             int gameId = GetCurrentGameId();
+            await Clients.Caller.SendAsync("AcceptConnectionId", Context.ConnectionId);
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
             await TryEnterGame(gameId);
-            await Clients.Caller.SendAsync("AcceptConnectionId", Context.ConnectionId);
             await TryStartGame(gameId);
             await base.OnConnectedAsync();
         }
@@ -47,14 +46,14 @@ namespace Fifth.Services
                 await HandleMoveRequest(game, posIndex);
         }
 
-        public async Task GetPlayersInfoRequest()
+        private async Task SendPlayersInfo()
         {
             int gameId = GetCurrentGameId();
             var game = await gamesCrudService.GetGameAsync(gameId);
             if (!game.IsAlive())
                 return;
             var players = game.GameInstance.GetPlayers();
-            await Clients.Caller.SendAsync("AcceptPlayersInfo", players);
+            await Clients.Group(gameId.ToString()).SendAsync("AcceptPlayersInfo", players);
         }
 
         private async Task TryStartGame(int gameId)
@@ -91,6 +90,8 @@ namespace Fifth.Services
             await Clients.Group(gameId.ToString()).SendAsync("OnPlayerEntered", Context.GetHttpContext().User.Identity.Name, Context.ConnectionId, res);
             if (!res)
                 await Clients.Caller.SendAsync("Disconnect");
+            else
+                await SendPlayersInfo();
         }
 
         private async Task AssignChars(GameSession game)

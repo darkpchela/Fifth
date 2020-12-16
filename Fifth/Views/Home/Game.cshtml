@@ -26,7 +26,7 @@
         <div class="modal-content bg-secondary border border-warning rounded">
             <div class="modal-header">
                 <h4 class="modal-title">Game over!</h4>
-                <a href="#" class="btn text-white bg-dark btn-lg close"  data-toggle="modal" data-target="#modalResult" rel="modal:close" aria-hidden="true">&times;</a>
+                <a href="#" class="btn text-white bg-dark btn-lg close" data-toggle="modal" data-target="#modalResult" rel="modal:close" aria-hidden="true">&times;</a>
             </div>
             <h3 id="result" class="modal-body">
             </h3>
@@ -41,7 +41,7 @@
         <div class="modal-content bg-secondary border border-warning rounded">
             <div class="modal-header">
                 <h4 class="modal-title">Game started!</h4>
-                <a href="#" class="btn text-white bg-dark btn-lg close"  data-toggle="modal" data-target="#modalStart" rel="modal:close"
+                <a href="#" class="btn text-white bg-dark btn-lg close" data-toggle="modal" data-target="#modalStart" rel="modal:close"
                    aria-hidden="true">&times;</a>
             </div>
             <div class="modal-footer">
@@ -89,13 +89,8 @@
             e.preventDefault();
             alert("clecked")
             hubConnection.invoke("GetPlayersInfoRequest");
-            swapUsernameClass(myConnectionId);
+            alert(myConnectionId);
         })
-
-        hubConnection.on("OnPlayerEntered", function (userName, id) {
-            console.log(`$User: ${userName} ConnectionId: ${id}`);
-            hubConnection.invoke("GetPlayersInfoRequest");
-        });
 
         hubConnection.on("Disconnect", () => {
             showResultModal("Game closed!")
@@ -106,26 +101,21 @@
         })
 
         hubConnection.on("AcceptPlayersInfo", (players) => {
-            for (var i = 0; i < players.length; i++) {
-                if (!$(userNameElems[i]).attr("data-id")) {
-                    $(userNameElems[i]).attr("data-id", players[i].connectionId)
-                    $(userNameElems[i]).text(players[i].userName);
-                }
+            for (let i = 0; i < players.length; i++) {
+                $(userNameElems[i]).attr("data-id", players[i].connectionId)
+                $(userNameElems[i]).text(players[i].userName);
             }
         });
 
         hubConnection.on("OnGameStarted", data => {
             showStartModal();
-            if (isMyMove) {
-                alert("myMove")
+            if (isMyMove === true) {
                 turnOffOnSuccess($(`h2[data-id=${myConnectionId}]`));
                 enableField();
             }
             else {
-                alert("not my move")
                 turnOffOnSuccess($(`h2[data-id!=${myConnectionId}]`));
             }
-            alert(myConnectionId)
         });
 
         hubConnection.on("OnMoveMaid", index => {
