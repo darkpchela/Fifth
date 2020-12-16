@@ -58,21 +58,7 @@ namespace Fifth.Services.BasicCRUD
                 var s = sessionTags.Where(st => st.TagId == id).Select(s => s.Session);
                 session = session.Intersect(s);
             }
-            //var grouped = sessionTags
-            //    .Select(st => new
-            //    {
-            //        id = st.SessionId,
-            //        tag = st.TagId,
-            //        session = st.Session
-            //    })
-            //    .GroupBy(n => n.id)
-            //    .Where(g => tagIds.Except(g.Select(g => g.tag)).Count() == 0);
-            //var session = new List<SessionData>();
-            //foreach (var g in grouped)
-            //{
-            //    g.
-            //}
-            return await session.ToListAsync();
+            return await session.Distinct().ToListAsync();
         }
     }
 }

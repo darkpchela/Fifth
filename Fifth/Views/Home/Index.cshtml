@@ -186,17 +186,11 @@
             .withUrl("/MainHub")
             .build();
 
-        hubConnection.on("Test", function (data) {
-            console.log(data);
-        });
-
         hubConnection.on("OnGameStartedOrClosed", id => {
-            console.log(`Game ${id} closed!`);
             $(`#gameCards div[data-id="${id}"]`).remove();
         });
 
         hubConnection.on("OnGameCreated", gameVm => {
-            console.log("Created");
             addCard(gameVm);
         });
 
