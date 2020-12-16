@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
@@ -7,6 +8,7 @@ namespace Fifth.Models
     [Table("Sessions")]
     public partial class SessionData
     {
+        [Key]
         public int Id { get; set; }
         public string Name { get; set; }
         public int CreatorId { get; set; }

@@ -2,7 +2,7 @@
 
 namespace Fifth.Migrations
 {
-    public partial class first : Migration
+    public partial class seven : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +12,7 @@ namespace Fifth.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Text = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
+                    Value = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,38 +58,18 @@ namespace Fifth.Migrations
                 name: "SessionTags",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     SessionId = table.Column<int>(type: "int", nullable: false),
                     TagId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
+                    table.PrimaryKey("PK_SessionTags", x => x.Id);
                     table.ForeignKey(
                         name: "FK_SessionTags_To_GameSessions",
                         column: x => x.SessionId,
                         principalTable: "Sessions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserSession",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    SessionId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.ForeignKey(
-                        name: "FK_UserSession_To_Session",
-                        column: x => x.SessionId,
-                        principalTable: "Sessions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserSession_To_Users",
-                        column: x => x.UserId,
-                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -107,7 +87,7 @@ namespace Fifth.Migrations
             migrationBuilder.CreateIndex(
                 name: "UQ_Text",
                 table: "Tags",
-                column: "Text",
+                column: "Value",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -115,16 +95,6 @@ namespace Fifth.Migrations
                 table: "Users",
                 column: "Login",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserSession_SessionId",
-                table: "UserSession",
-                column: "SessionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserSession_UserId",
-                table: "UserSession",
-                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -134,9 +104,6 @@ namespace Fifth.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tags");
-
-            migrationBuilder.DropTable(
-                name: "UserSession");
 
             migrationBuilder.DropTable(
                 name: "Sessions");

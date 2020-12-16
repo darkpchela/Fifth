@@ -98,7 +98,7 @@
         });
 
         hubConnection.on("Disconnect", () => {
-            showResultModal("Connection with opponent lost!")
+            showResultModal("Game closed!")
         });
 
         hubConnection.on("AcceptConnectionId", id => {

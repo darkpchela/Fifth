@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Fifth.Services
 {
@@ -20,22 +21,28 @@ namespace Fifth.Services
 
         private readonly IUserCrudService userCrudService;
 
+        private readonly ISessionTagCrudService sessionTagCrudService;
+
+        private readonly ITagCrudService tagCrudService;
+
         private readonly IMapper mapper;
 
         public GameProccessManager(IHubContext<MainHub> hubContext, IMapper mapper, IGamesCrudService gamesCrudService, 
-            IUnitOfWork unitOfWork, IUserCrudService userCrudService)
+            IUnitOfWork unitOfWork, IUserCrudService userCrudService, ISessionTagCrudService sessionTagCrudService, ITagCrudService tagCrudService)
         {
             this.hubContext = hubContext;
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.gamesCrudService = gamesCrudService;
             this.userCrudService = userCrudService;
+            this.sessionTagCrudService = sessionTagCrudService;
+            this.tagCrudService = tagCrudService;
         }
 
         public async Task CloseGameAsync(int id)
         {
             await gamesCrudService.DeleteAsync(id);
-            OnGameStartedOrClosed(id);
+            await OnGameStartedOrClosed(id);
         }
 
         public async Task<bool> TryEnterGameAsync(string connectionId, string login, int gameId)
@@ -54,7 +61,7 @@ namespace Fifth.Services
                 return false;
             game.Start();
             await gamesCrudService.UpdateAsync(game);
-            OnGameStartedOrClosed(game.GameData.Id);
+            await OnGameStartedOrClosed(game.GameData.Id);
             return true;
         }
 
@@ -62,7 +69,9 @@ namespace Fifth.Services
         {
             var user = await userCrudService.GetByLoginAsync(createGameVM.Username);
             var gameId = await gamesCrudService.CreateAsync(createGameVM.Name, user);
-            OnGameCreated(gameId);
+            var tags = JsonConvert.DeserializeObject<Tag[]>(createGameVM.Tags).Select(t=> t.Value);
+            await UpdateTags(gameId, tags);
+            await OnGameCreated(gameId);
             return gameId;
         }
 
@@ -73,16 +82,33 @@ namespace Fifth.Services
             return await VMs.ToListAsync();
         }
 
-        private async void OnGameCreated(int gameId)
+        private async Task OnGameCreated(int gameId)
         {
             var game = await gamesCrudService.GetGameAsync(gameId);
             var gameVm = mapper.Map<GameSessionVM>(game.GameData);
             await hubContext.Clients.All.SendAsync("OnGameCreated", gameVm);
         }
 
-        private async void OnGameStartedOrClosed(int gameid)
+        private async Task OnGameStartedOrClosed(int gameid)
         {
             await hubContext.Clients.All.SendAsync("OnGameStartedOrClosed", gameid);
+        }
+
+        private async Task UpdateTags(int gameId, IEnumerable<string> values)
+        {
+            foreach (var v in values)
+            {
+                Tag tag = await tagCrudService.GetAsync(v);
+                if (tag is null)
+                {
+                    tag = new Tag
+                    {
+                        Value = v
+                    };
+                    await tagCrudService.CreateAsync(tag);
+                }
+                await sessionTagCrudService.CreateAsync(gameId, tag.Id);
+            }
         }
     }
 }

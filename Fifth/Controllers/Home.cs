@@ -54,7 +54,6 @@ namespace Fifth.Controllers
             if (!ModelState.IsValid)
                 return PartialView("_CreateGame" ,createGameVM);
             createGameVM.Username = HttpContext.User.Identity.Name;
-            //var a = JsonConvert.DeserializeObject<Tag[]>(createGameVM.Tags);
             int id = await gameManageService.OpenGameAsync(createGameVM);
             return PartialView("_GameCreated", id);
         }

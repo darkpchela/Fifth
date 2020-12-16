@@ -44,11 +44,18 @@ namespace Fifth.Migrations
 
             modelBuilder.Entity("Fifth.Models.SessionTag", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
                     b.Property<int>("SessionId")
                         .HasColumnType("int");
 
                     b.Property<int>("TagId")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex(new[] { "SessionId" }, "IX_SessionTags_SessionId");
 
@@ -62,14 +69,14 @@ namespace Fifth.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("Text")
+                    b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "Text" }, "UQ_Text")
+                    b.HasIndex(new[] { "Value" }, "UQ_Text")
                         .IsUnique();
 
                     b.ToTable("Tags");

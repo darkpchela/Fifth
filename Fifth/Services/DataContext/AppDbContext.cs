@@ -46,9 +46,7 @@ namespace Fifth.Services.DataContext
             });
 
             modelBuilder.Entity<SessionTag>(entity =>
-            {
-                entity.HasNoKey();
-
+            { 
                 entity.HasIndex(e => e.SessionId, "IX_SessionTags_SessionId");
 
                 entity.HasOne(d => d.Session)
@@ -60,10 +58,10 @@ namespace Fifth.Services.DataContext
 
             modelBuilder.Entity<Tag>(entity =>
             {
-                entity.HasIndex(e => e.Text, "UQ_Text")
+                entity.HasIndex(e => e.Value, "UQ_Text")
                     .IsUnique();
 
-                entity.Property(e => e.Text)
+                entity.Property(e => e.Value)
                     .IsRequired()
                     .HasMaxLength(32);
             });

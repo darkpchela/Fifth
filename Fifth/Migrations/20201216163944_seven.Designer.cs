@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fifth.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20201215163139_first")]
-    partial class first
+    [Migration("20201216163944_seven")]
+    partial class seven
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -46,11 +46,18 @@ namespace Fifth.Migrations
 
             modelBuilder.Entity("Fifth.Models.SessionTag", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
                     b.Property<int>("SessionId")
                         .HasColumnType("int");
 
                     b.Property<int>("TagId")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex(new[] { "SessionId" }, "IX_SessionTags_SessionId");
 
@@ -64,14 +71,14 @@ namespace Fifth.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("Text")
+                    b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "Text" }, "UQ_Text")
+                    b.HasIndex(new[] { "Value" }, "UQ_Text")
                         .IsUnique();
 
                     b.ToTable("Tags");
@@ -102,21 +109,6 @@ namespace Fifth.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Fifth.Models.UserSession", b =>
-                {
-                    b.Property<int>("SessionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("SessionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserSession");
-                });
-
             modelBuilder.Entity("Fifth.Models.SessionData", b =>
                 {
                     b.HasOne("Fifth.Models.User", "Creator")
@@ -138,26 +130,6 @@ namespace Fifth.Migrations
                         .IsRequired();
 
                     b.Navigation("Session");
-                });
-
-            modelBuilder.Entity("Fifth.Models.UserSession", b =>
-                {
-                    b.HasOne("Fifth.Models.SessionData", "Session")
-                        .WithMany()
-                        .HasForeignKey("SessionId")
-                        .HasConstraintName("FK_UserSession_To_Session")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Fifth.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_UserSession_To_Users")
-                        .IsRequired();
-
-                    b.Navigation("Session");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Fifth.Models.User", b =>
