@@ -41,7 +41,7 @@ namespace Fifth.Services.BasicCRUD
 
         public async Task<IEnumerable<Tag>> GetTagsBySessionAsync(int sessionId)
         {
-            var sessionData = await unitOfWork.DbContext.Sessions.FindAsync(sessionId);
+            var sessionData = await unitOfWork.DbContext.SessionDatas.FindAsync(sessionId);
             if (sessionData == null)
                 return new List<Tag>();
             var tagsId = unitOfWork.DbContext.SessionTags.Where(s => s.SessionId == sessionId).Select(st => st.TagId);

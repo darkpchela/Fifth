@@ -9,13 +9,13 @@ namespace Fifth.Models
     {
         public User()
         {
-            Sessions = new HashSet<SessionData>();
+            SessionData = new HashSet<SessionData>();
         }
 
         public int Id { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
 
-        public virtual ICollection<SessionData> Sessions { get; set; }
+        public virtual ICollection<SessionData> SessionData { get; set; }
     }
 }

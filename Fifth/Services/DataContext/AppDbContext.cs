@@ -18,7 +18,7 @@ namespace Fifth.Services.DataContext
         {
         }
 
-        public virtual DbSet<SessionData> Sessions { get; set; }
+        public virtual DbSet<SessionData> SessionDatas { get; set; }
         public virtual DbSet<SessionTag> SessionTags { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<User> Users { get; set; }
@@ -40,7 +40,7 @@ namespace Fifth.Services.DataContext
                 entity.HasIndex(e => e.CreatorId, "IX_GameInfoDatas_CreatorId");
 
                 entity.HasOne(d => d.Creator)
-                    .WithMany(p => p.Sessions)
+                    .WithMany(p => p.SessionData)
                     .HasForeignKey(d => d.CreatorId)
                     .HasConstraintName("FK_GameSessions_To_Users");
             });

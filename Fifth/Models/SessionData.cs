@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
 namespace Fifth.Models
 {
-    [Table("Sessions")]
     public partial class SessionData
     {
         public SessionData()
@@ -21,11 +19,5 @@ namespace Fifth.Models
 
         public virtual User Creator { get; set; }
         public virtual ICollection<SessionTag> SessionTags { get; set; }
-
-        public SessionData(string name, User userCreator)
-        {
-            this.Name = name;
-            this.Creator = userCreator;
-        }
     }
 }

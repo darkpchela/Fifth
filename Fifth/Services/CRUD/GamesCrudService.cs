@@ -17,10 +17,14 @@ namespace Fifth.Services
 
         public async Task CreateAsync(string gameName, User userCreator)
         {
-            if (await unitOfWork.DbContext.Sessions.AnyAsync(s => s.Name == gameName))
+            if (await unitOfWork.DbContext.SessionDatas.AnyAsync(s => s.Name == gameName))
                 return;
-            SessionData gameData = new SessionData(gameName, userCreator);
-            unitOfWork.DbContext.Sessions.Add(gameData);
+            SessionData gameData = new SessionData
+            {
+                Name = gameName,
+                Creator = userCreator
+            };
+            unitOfWork.DbContext.SessionDatas.Add(gameData);
             await unitOfWork.DbContext.SaveChangesAsync();
             GameSession game = new GameSession(gameData);
             await unitOfWork.GamesStore.Create(game.Instance);
@@ -34,10 +38,10 @@ namespace Fifth.Services
 
         public async Task DeleteAsync(int gameId)
         {
-            var gameData = await unitOfWork.DbContext.Sessions.Include(t => t.Creator).FirstOrDefaultAsync(d => d.Id == gameId);
+            var gameData = await unitOfWork.DbContext.SessionDatas.Include(t => t.Creator).FirstOrDefaultAsync(d => d.Id == gameId);
             if (gameData != null)
             {
-                unitOfWork.DbContext.Sessions.Remove(gameData);
+                unitOfWork.DbContext.SessionDatas.Remove(gameData);
                 unitOfWork.DbContext.SaveChanges();
             }
             await unitOfWork.GamesStore.Delete(gameId);
@@ -45,7 +49,7 @@ namespace Fifth.Services
 
         public async Task<GameSession> GetGameAsync(int id)
         {
-            var gameData = await unitOfWork.DbContext.Sessions.FindAsync(id);
+            var gameData = await unitOfWork.DbContext.SessionDatas.FindAsync(id);
             var gameInstance = await unitOfWork.GamesStore.Get(id);
             var game = new GameSession(gameData, gameInstance);
             return game;
@@ -53,7 +57,7 @@ namespace Fifth.Services
 
         public async Task<GameSession> GetGameAsync(string name)
         {
-            var gameData = await unitOfWork.DbContext.Sessions.FirstOrDefaultAsync(g=> g.Name == name);
+            var gameData = await unitOfWork.DbContext.SessionDatas.FirstOrDefaultAsync(g=> g.Name == name);
             var gameInstance = await unitOfWork.GamesStore.Get(gameData.Id);
             var game = new GameSession(gameData, gameInstance);
             return game;
@@ -62,7 +66,7 @@ namespace Fifth.Services
         public async Task<IEnumerable<GameSession>> GetAllGamesAsync()
         {
             var games = new List<GameSession>();
-            foreach (var gd in unitOfWork.DbContext.Sessions.Include(e => e.Creator))
+            foreach (var gd in unitOfWork.DbContext.SessionDatas.Include(e => e.Creator))
             {
                 var gi = await GetGameInstance(gd.Id);
                 games.Add(new GameSession(gd, gi));
