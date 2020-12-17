@@ -31,8 +31,8 @@ namespace Fifth.Services
         public async override Task OnDisconnectedAsync(Exception exception)
         {
             int gameId = GetCurrentGameId();
-            await gameProccessManager.CloseGameAsync(gameId);
             await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
+            await gameProccessManager.CloseGameAsync(gameId);
             await base.OnDisconnectedAsync(exception);
         }
 
