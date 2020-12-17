@@ -33,23 +33,14 @@ html {
   font-size: 16px;
 }
 
-
-@media (max-width: 1200px){
-  html {
-    font-size: 12px;
-  }
-  h5{
-    font-size: 14px;
-  }
+span:hover{
+    cursor:default;
 }
-
-@media (max-width: 680px){
-  html {
-    font-size: 10px;
-  }
-  h5{
-    font-size: 12px;
-  }
+h5:hover{
+    cursor:default;
+}
+h6:hover{
+    cursor:default
 }
 
 .border-top {
@@ -129,4 +120,14 @@ a.tag{
 
 .modal{
   background-color: rgba(0, 0, 0, 0.5)
+}
+
+.gameCard{
+    width: 200px;
+    height: 150px;
+}
+@media only screen and (min-device-width: 481px){
+    .game-board{
+        flex-wrap: nowrap;
+    }
 }
