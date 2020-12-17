@@ -175,25 +175,12 @@
         $(updateTagify());
     </script>
     <script>
-        function addCard(data) {
-            let cardElem = $('#cardPrototype').clone();
-            cardElem.removeAttr('id');
-            cardElem.attr("data-id", data.id)
-            $(cardElem).find('[name="game"]').text(data.name);
-            $(cardElem).find('[name="user"]').text(data.userName);
-            $(cardElem).find('[name="ref"]').prop('href', `/Home/Game/${data.id}`);
-            $(cardElem).find();
-            cardElem.prop('hidden', false);
-            $('#gameCards').append(cardElem);
-        };
-
-
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/MainHub")
             .build();
 
         hubConnection.on("OnGameStartedOrClosed", id => {
-            $(`#gameCards div[data-id="${id}"]`).remove();
+            updateTableAjax();
         });
 
         hubConnection.on("OnGameCreated", gameVm => {
