@@ -21,13 +21,13 @@ namespace Fifth.Services
             unitOfWork.DbContext.Sessions.Add(gameData);
             await unitOfWork.DbContext.SaveChangesAsync();
             GameSession game = new GameSession(gameData);
-            await unitOfWork.GamesStore.Create(game.GameInstance);
-            return game.GameData.Id;
+            await unitOfWork.GamesStore.Create(game.Instance);
+            return game.Data.Id;
         }
 
         public async Task UpdateAsync(GameSession game)
         {
-            unitOfWork.DbContext.Entry(game.GameData).State = EntityState.Modified;
+            unitOfWork.DbContext.Entry(game.Data).State = EntityState.Modified;
             await unitOfWork.DbContext.SaveChangesAsync();
         }
 

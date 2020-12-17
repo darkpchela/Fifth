@@ -6,7 +6,9 @@
 
         public bool GameFinished { get; }
 
-        public string Result { get; }
+        public bool IsDraw { get; }
+
+        public string Winner { get; }
 
         public MoveResult(bool moveMaid)
         {
@@ -14,11 +16,13 @@
             GameFinished = false;
         }
 
-        public MoveResult(string result)
+        public MoveResult(string winner = null)
         {
             MoveMaid = true;
             GameFinished = true;
-            Result = result;
+            Winner = winner;
+            if (winner is null)
+                IsDraw = true;
         }
     }
 }

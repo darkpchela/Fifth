@@ -50,17 +50,18 @@ namespace Fifth.Services
                 return false;
             }
             var user = await userCrudService.GetByLoginAsync(login);
-            var res = game.GameInstance.RegistPlayer(connectionId, user);
+            var res = game.Instance.RegistPlayer(connectionId, user);
             return res;
         }
 
         public async Task<bool> TryStartGameAsync(GameSession game)
         {
-            if (!game.IsAlive() || !game.GameInstance.IsReadyToStart)
+            if (!game.IsAlive() || !game.Instance.IsReadyToStart)
                 return false;
-            game.Start();
+            game.Data.Started = true;
+            game.Instance.StartGame();
             await gamesCrudService.UpdateAsync(game);
-            await OnGameStartedOrClosed(game.GameData.Id);
+            await OnGameStartedOrClosed(game.Data.Id);
             return true;
         }
 
@@ -80,7 +81,7 @@ namespace Fifth.Services
         private async Task OnGameCreated(int gameId)
         {
             var game = await gamesCrudService.GetGameAsync(gameId);
-            var gameVm = mapper.Map<GameSessionVM>(game.GameData);
+            var gameVm = mapper.Map<GameSessionVM>(game.Data);
             await hubContext.Clients.All.SendAsync("OnGameCreated", gameVm);
         }
 

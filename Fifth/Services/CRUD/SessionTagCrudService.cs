@@ -21,7 +21,7 @@ namespace Fifth.Services.BasicCRUD
 
         public async Task CreateAsync(int gameId, int tagId)
         {
-            var sessionData = (await gamesCrudService.GetGameAsync(gameId)).GameData;
+            var sessionData = (await gamesCrudService.GetGameAsync(gameId)).Data;
             if (sessionData != null && await unitOfWork.DbContext.Tags.AnyAsync(t => t.Id == tagId))
             {
                 var entity = new SessionTag

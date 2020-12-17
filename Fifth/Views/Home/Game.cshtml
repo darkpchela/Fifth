@@ -141,7 +141,10 @@
 
         hubConnection.on("OnGameOver", res => {
             disableField();
-            showResultModal(res);
+            if (res.isDraw === true)
+                showResultModal("It' draw!");
+            else
+                showResultModal(`Winner is ${res.winner}!`);
         });
 
         $('#gameboard button').click(e => {

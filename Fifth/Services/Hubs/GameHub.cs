@@ -52,7 +52,7 @@ namespace Fifth.Services
             var game = await gamesCrudService.GetGameAsync(gameId);
             if (!game.IsAlive())
                 return;
-            var players = game.GameInstance.GetPlayers();
+            var players = game.Instance.GetPlayers();
             await Clients.Group(gameId.ToString()).SendAsync("AcceptPlayersInfo", players);
         }
 
@@ -71,17 +71,17 @@ namespace Fifth.Services
             if (res)
             {
                 await AssignChars(game);
-                await Clients.Groups(game.GameInstance.Id.ToString()).SendAsync("OnGameStarted");
+                await Clients.Groups(game.Instance.Id.ToString()).SendAsync("OnGameStarted");
             }
         }
 
         private async Task HandleMoveRequest(GameSession game, int index)
         {
-            var res = game.GameInstance.MakeMove(index, Context.ConnectionId);
+            var res = game.Instance.MakeMove(index, Context.ConnectionId);
             if (res.MoveMaid)
-                await Clients.Group(game.GameInstance.Id).SendAsync("OnMoveMaid", index);
+                await Clients.Group(game.Instance.Id).SendAsync("OnMoveMaid", index);
             if (res.GameFinished)
-                await Clients.Group(game.GameInstance.Id).SendAsync("OnGameOver", res.Result);
+                await Clients.Group(game.Instance.Id).SendAsync("OnGameOver", res);
         }
 
         private async Task TryEnterGame(int gameId)
@@ -96,8 +96,8 @@ namespace Fifth.Services
 
         private async Task AssignChars(GameSession game)
         {
-            var starter = game.GameInstance.CurrentPlayer;
-            await Clients.GroupExcept(game.GameInstance.Id, starter.ConnectionId).SendAsync("AcceptChar", "o");
+            var starter = game.Instance.CurrentPlayer;
+            await Clients.GroupExcept(game.Instance.Id, starter.ConnectionId).SendAsync("AcceptChar", "o");
             await Clients.Client(starter.ConnectionId).SendAsync("AcceptChar", "x");
         }
 
