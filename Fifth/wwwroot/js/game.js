@@ -67,6 +67,10 @@ hubConnection.on("AcceptChar", char => {
         isMyMove = true;
 });
 
+hubConnection.on("OnDisconnect", () => {
+    showResultModal("Game closed or connection lost");
+});
+
 hubConnection.on("OnGameOver", res => {
     disableField();
     if (res.isDraw === true)

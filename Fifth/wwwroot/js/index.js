@@ -33,6 +33,7 @@ const updateTagify = () => {
     if (input) {
         tagify = new Tagify(input, {
             whitelist: [],
+            delimiters: ",| ",    
             maxTags: 5,
             dropdown: {
                 maxItems: 20,
@@ -106,11 +107,7 @@ const hubConnection = new signalR.HubConnectionBuilder()
     .withUrl("/MainHub")
     .build();
 
-hubConnection.on("OnGameStartedOrClosed", id => {
-    updateTableAjax();
-});
-
-hubConnection.on("OnGameCreated", gameVm => {
+hubConnection.on("UpdateGamesTable", () => {
     updateTableAjax();
 });
 

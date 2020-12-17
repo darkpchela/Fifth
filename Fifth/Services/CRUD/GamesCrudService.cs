@@ -15,10 +15,10 @@ namespace Fifth.Services
             this.unitOfWork = unitOfWork;
         }
 
-        public async Task CreateAsync(string gameName, User userCreator)
+        public async Task<int> CreateAsync(string gameName, User userCreator)
         {
             if (await unitOfWork.DbContext.SessionDatas.AnyAsync(s => s.Name == gameName))
-                return;
+                return -1;
             SessionData gameData = new SessionData
             {
                 Name = gameName,
@@ -28,6 +28,7 @@ namespace Fifth.Services
             await unitOfWork.DbContext.SaveChangesAsync();
             GameSession game = new GameSession(gameData);
             await unitOfWork.GamesStore.Create(game.Instance);
+            return gameData.Id;
         }
 
         public async Task UpdateAsync(GameSession game)

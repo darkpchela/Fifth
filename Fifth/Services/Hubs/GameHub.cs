@@ -32,7 +32,7 @@ namespace Fifth.Services
         {
             int gameId = GetCurrentGameId();
             await gameProccessManager.CloseGameAsync(gameId);
-            await Clients.Group(gameId.ToString()).SendAsync("Disconnect");
+            await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
             await base.OnDisconnectedAsync(exception);
         }
 
@@ -41,7 +41,7 @@ namespace Fifth.Services
             int gameId = GetCurrentGameId();
             var game = await gamesCrudService.GetGameAsync(gameId);
             if (!game.IsAlive() || !int.TryParse(index, out int posIndex))
-                await Clients.Group(gameId.ToString()).SendAsync("Disconnect");
+                await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
             else
                 await HandleMoveRequest(game, posIndex);
         }
@@ -81,7 +81,7 @@ namespace Fifth.Services
             var res = await gameProccessManager.TryEnterGameAsync(Context.ConnectionId, Context.User.Identity.Name, gameId);
             await Clients.Group(gameId.ToString()).SendAsync("OnPlayerEntered", Context.GetHttpContext().User.Identity.Name, Context.ConnectionId, res);
             if (!res)
-                await Clients.Caller.SendAsync("Disconnect");
+                Context.Abort();
             else
                 await SendPlayersInfo();
         }

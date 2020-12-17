@@ -6,7 +6,7 @@ namespace Fifth.Interfaces
 {
     public interface IGamesCrudService
     {
-        Task CreateAsync(string gameName, User userCreator);
+        Task<int> CreateAsync(string gameName, User userCreator);
 
         Task UpdateAsync(GameSession game);
 

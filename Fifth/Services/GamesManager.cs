@@ -37,7 +37,7 @@ namespace Fifth.Services
         public async Task CloseGameAsync(int id)
         {
             await gamesCrudService.DeleteAsync(id);
-            await OnGameStartedOrClosed(id);
+            await OnGameStartedOrClosed();
         }
 
         public async Task<bool> TryEnterGameAsync(string connectionId, string login, int gameId)
@@ -60,32 +60,30 @@ namespace Fifth.Services
             game.Data.Started = true;
             game.Instance.StartGame();
             await gamesCrudService.UpdateAsync(game);
-            await OnGameStartedOrClosed(game.Data.Id);
+            await OnGameStartedOrClosed();
             return true;
         }
 
         public async Task<int> OpenGameAsync(CreateGameVM createGameVM, string userName)
         {
             var user = await userCrudService.GetByLoginAsync(userName);
-            await gamesCrudService.CreateAsync(createGameVM.Name, user);
-            var game = await gamesCrudService.GetGameAsync(createGameVM.Name);
-            if (!game.IsAlive())
-                return -1;
-            await UpdateTags(game.Data.Id, createGameVM.Tags);
-            await OnGameCreated(game);
-            return game.Data.Id;
+            int id = await gamesCrudService.CreateAsync(createGameVM.Name, user);
+            if (id != -1)
+            {
+                await UpdateTags(id, createGameVM.Tags);
+                await OnGameCreated();
+            }
+            return id;
         }
 
-        private async Task OnGameCreated(GameSession game)
+        private async Task OnGameCreated()
         {
-            ;
-            var gameVm = mapper.Map<SessionVM>(game.Data);
-            await hubContext.Clients.All.SendAsync("OnGameCreated", gameVm);
+            await hubContext.Clients.All.SendAsync("UpdateGamesTable");
         }
 
-        private async Task OnGameStartedOrClosed(int gameid)
+        private async Task OnGameStartedOrClosed()
         {
-            await hubContext.Clients.All.SendAsync("OnGameStartedOrClosed", gameid);
+            await hubContext.Clients.All.SendAsync("UpdateGamesTable");
         }
 
         private async Task UpdateTags(int gameId, string tagsJson)

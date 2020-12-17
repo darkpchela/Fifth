@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<SessionVM>
 @inject Fifth.Interfaces.ISessionTagCrudService sessionTagService
 
+<div class="h-75">
+
 <div class="text-center">
     <h3 class="text-monospace text-warning">Games</h3>
 </div>
@@ -9,12 +11,12 @@
     <div class="gameCard">
         <div class="border rounded border-warning m-2 p-2 bg-secondary">
             <div class="text-center text-monospace text-warning">
-                <h5 class="bg-dark rounded">[Create]</h5>
-                <h6 class="bg-dark rounded ">[New]</h6>
-                <div class="text-center bg-dark rounded overflow-hidden">
+                <h5 class="bg-dark text-white-50 rounded">[Create]</h5>
+                <h6 class="bg-dark text-white-50 rounded ">[New]</h6>
+                <div class="text-center text-white-50 bg-dark rounded overflow-hidden">
                     [Game]
                 </div>
-                <h6 class="mt-2">
+                <h6 class="mt-2  bg-dark rounded">
                     <a id="newGame" class="text-warning" href="https://localhost:44306/Home/Game/83">Create</a>
                 </h6>
             </div>
@@ -44,11 +46,12 @@
                             }
                         }
                     </div>
-                    <h6 class="mt-2">
+                    <h6 class="mt-2 bg-dark rounded">
                         <a class="text-warning " asp-action="Game" asp-route-id="@g.Id">Join</a>
                     </h6>
                 </div>
             </div>
         </div>
     }
+</div>
 </div>

@@ -44,7 +44,7 @@ namespace Fifth.Controllers
         {
             List<SessionData> sessions;
             if (string.IsNullOrEmpty(tagsJson))
-                sessions = (await gamesCrudService.GetAllGamesAsync()).Where(g => g.IsAlive()).Select(g => g.Data).Where(g => !g.Started).ToList();
+                sessions = (await gamesCrudService.GetAllGamesAsync()).Select(g => g.Data).Where(g => !g.Started).ToList();
             else
             {
                 var inputTags = JsonConvert.DeserializeObject<Tag[]>(tagsJson).Select(t => t.Id);

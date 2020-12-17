@@ -34,12 +34,12 @@ namespace Fifth
             services.AddSingleton<IGameInstanceRepository, GameInstanceRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IAppAuthenticationService, AppAuthenticationService>();
-            services.AddScoped<ITagCrudService, TagCrudService>();
-            services.AddScoped<IUserCrudService, UserCrudService>();
-            services.AddScoped<IGamesCrudService, GamesCrudService>();
-            services.AddScoped<IGamesManager, GamesManager>();
-            services.AddScoped<ISessionTagCrudService, SessionTagCrudService>();
-            services.AddScoped<ITagCrudService, TagCrudService>();
+            services.AddTransient<ITagCrudService, TagCrudService>();
+            services.AddTransient<IUserCrudService, UserCrudService>();
+            services.AddTransient<IGamesCrudService, GamesCrudService>();
+            services.AddTransient<IGamesManager, GamesManager>();
+            services.AddTransient<ISessionTagCrudService, SessionTagCrudService>();
+            services.AddTransient<ITagCrudService, TagCrudService>();
             services.AddAutomapperProfiles();
             services.AddSignalR();
         }
