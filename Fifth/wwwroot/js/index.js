@@ -33,7 +33,7 @@ const updateTagify = () => {
     if (input) {
         tagify = new Tagify(input, {
             whitelist: [],
-            maxTags: 10,
+            maxTags: 5,
             dropdown: {
                 maxItems: 20,
                 classname: "tags-look",
