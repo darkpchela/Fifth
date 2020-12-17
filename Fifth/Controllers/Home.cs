@@ -38,10 +38,6 @@ namespace Fifth.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [HttpPost]
         public async Task<IActionResult> _GamesTable(string tagsJson)
