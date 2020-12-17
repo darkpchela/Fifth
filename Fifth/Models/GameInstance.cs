@@ -14,11 +14,11 @@ namespace Fifth.Models
 
         private Dictionary<char, UserConnection> charUser = new Dictionary<char, UserConnection>();
 
+        private List<UserConnection> players = new List<UserConnection>();
+
         public string Id { get; }
 
         public bool IsReadyToStart { get; private set; }
-
-        private List<UserConnection> players = new List<UserConnection>();
 
         public UserConnection CurrentPlayer { get; private set; }
 
@@ -133,7 +133,7 @@ namespace Fifth.Models
             {
                 for (int j = 1; j < rowLength; j++)
                 {
-                    if (array[i + rowLength * j]!= null && array[i + rowLength * j] == array[i + rowLength * (j - 1)])
+                    if (array[i + rowLength * j] != null && array[i + rowLength * j] == array[i + rowLength * (j - 1)])
                     {
                         value = array[i + rowLength * j];
                         isMathed = true;
@@ -160,7 +160,7 @@ namespace Fifth.Models
                 for (int j = 1; j < rank; j++)
                 {
                     int k = (int)Math.Pow(-1, i);
-                    if (array[rank * j + j * k + (rank - 1) * i]!= null && array[rank * j + j * k + (rank - 1) * i] == array[rank * (j - 1) + (j - 1) * k + (rank - 1) * i])
+                    if (array[rank * j + j * k + (rank - 1) * i] != null && array[rank * j + j * k + (rank - 1) * i] == array[rank * (j - 1) + (j - 1) * k + (rank - 1) * i])
                     {
                         value = array[rank * j + j * k + (rank - 1) * i];
                         isMatched = true;
