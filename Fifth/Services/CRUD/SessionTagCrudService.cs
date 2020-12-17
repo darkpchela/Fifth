@@ -58,7 +58,7 @@ namespace Fifth.Services.BasicCRUD
                 var s = sessionTags.Where(st => st.TagId == id).Select(s => s.Session);
                 session = session.Intersect(s);
             }
-            return await session.Distinct().ToListAsync();
+            return await session.Distinct().Include(e => e.Creator).ToListAsync();
         }
     }
 }
