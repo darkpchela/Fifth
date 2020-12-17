@@ -87,7 +87,6 @@
         })
 
         hubConnection.on("AcceptPlayersInfo", (players) => {
-            alert(userNameElems.length)
             for (let i = 0; i < players.length; i++) {
                 $(userNameElems[i]).attr("data-id", players[i].connectionId)
                 $(userNameElems[i]).text(players[i].userName);
@@ -115,8 +114,8 @@
                 enableField();
                 myChar == "o" ? setCharToCell(index, crossElem) : setCharToCell(index, circleElem);
             }
-            turnOffOnSuccess($(`h2[data-id=${myConnectionId}]`));
-            turnOffOnSuccess($(`h2[data-id!=${myConnectionId}]`));
+            turnOffOnSuccess($(`h3[data-id=${myConnectionId}]`));
+            turnOffOnSuccess($(`h3[data-id!=${myConnectionId}]`));
             isMyMove = !isMyMove;
         });
 
