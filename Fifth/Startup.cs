@@ -37,7 +37,7 @@ namespace Fifth
             services.AddScoped<ITagCrudService, TagCrudService>();
             services.AddScoped<IUserCrudService, UserCrudService>();
             services.AddScoped<IGamesCrudService, GamesCrudService>();
-            services.AddScoped<IGameProccessManager, GameProccessManager>();
+            services.AddScoped<IGamesManager, GamesManager>();
             services.AddScoped<ISessionTagCrudService, SessionTagCrudService>();
             services.AddScoped<ITagCrudService, TagCrudService>();
             services.AddAutomapperProfiles();

@@ -92,10 +92,11 @@ namespace Fifth.Models
         {
             if (!CheckLines(map, 3, out char? value))
                 if (!CheckColumns(map, 3, out value))
-                    if (!CheckDiagonals(map, 3, out value) && movesCount < 9)
-                        return new MoveResult(true);
-                    else
-                        return new MoveResult();
+                    if (!CheckDiagonals(map, 3, out value))
+                        if (movesCount < 9)
+                            return new MoveResult(true);
+                        else
+                            return new MoveResult();
             return new MoveResult($"{charUser[value.Value].UserName}");
         }
 

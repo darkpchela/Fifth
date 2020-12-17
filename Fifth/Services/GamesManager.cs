@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Fifth.Services
 {
-    public class GameProccessManager : IGameProccessManager
+    public class GamesManager : IGamesManager
     {
         private readonly IGamesCrudService gamesCrudService;
 
@@ -23,7 +23,7 @@ namespace Fifth.Services
 
         private readonly IMapper mapper;
 
-        public GameProccessManager(IHubContext<MainHub> hubContext, IMapper mapper, IGamesCrudService gamesCrudService,
+        public GamesManager(IHubContext<MainHub> hubContext, IMapper mapper, IGamesCrudService gamesCrudService,
             IUserCrudService userCrudService, ISessionTagCrudService sessionTagCrudService, ITagCrudService tagCrudService)
         {
             this.hubContext = hubContext;
@@ -79,7 +79,7 @@ namespace Fifth.Services
         private async Task OnGameCreated(GameSession game)
         {
             ;
-            var gameVm = mapper.Map<GameSessionVM>(game.Data);
+            var gameVm = mapper.Map<SessionVM>(game.Data);
             await hubContext.Clients.All.SendAsync("OnGameCreated", gameVm);
         }
 

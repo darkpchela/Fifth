@@ -15,14 +15,14 @@ namespace Fifth.Controllers
 {
     public class Home : Controller
     {
-        private readonly IGameProccessManager gameManageService;
+        private readonly IGamesManager gameManageService;
         private readonly ITagCrudService tagCrudService;
         private readonly IAppAuthenticationService authenticationService;
         private readonly ISessionTagCrudService sessionTagCrudService;
         private readonly IGamesCrudService gamesCrudService;
         private readonly IMapper mapper;
 
-        public Home(IGameProccessManager gameManageService, IAppAuthenticationService authenticationService, ITagCrudService tagCrudService, ISessionTagCrudService sessionTagCrudService,
+        public Home(IGamesManager gameManageService, IAppAuthenticationService authenticationService, ITagCrudService tagCrudService, ISessionTagCrudService sessionTagCrudService,
             IGamesCrudService gamesCrudService, IMapper mapper)
         {
             this.gameManageService = gameManageService;
@@ -48,13 +48,13 @@ namespace Fifth.Controllers
         {
             List<SessionData> sessions;
             if (string.IsNullOrEmpty(tagsJson))
-                sessions = (await gamesCrudService.GetAllGamesAsync()).Select(g => g.Data).Where(g => !g.Started).ToList();
+                sessions = (await gamesCrudService.GetAllGamesAsync()).Where(g => g.IsAlive()).Select(g => g.Data).Where(g => !g.Started).ToList();
             else
             {
                 var inputTags = JsonConvert.DeserializeObject<Tag[]>(tagsJson).Select(t => t.Id);
                 sessions = (await sessionTagCrudService.GetSessionsByTagAsync(inputTags)).ToList();
             }
-            var VMs = mapper.Map<IEnumerable<GameSessionVM>>(sessions);
+            var VMs = mapper.Map<IEnumerable<SessionVM>>(sessions);
             return PartialView(VMs);
         }
 

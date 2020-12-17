@@ -2,7 +2,7 @@
 
 namespace Fifth.ViewModels
 {
-    public class GameSessionVM
+    public class SessionVM
     {
         public int Id { get; set; }
 

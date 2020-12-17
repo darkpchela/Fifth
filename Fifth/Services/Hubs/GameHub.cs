@@ -9,10 +9,10 @@ namespace Fifth.Services
 {
     public class GameHub : Hub
     {
-        private IGameProccessManager gameProccessManager;
+        private IGamesManager gameProccessManager;
         private IGamesCrudService gamesCrudService;
 
-        public GameHub(IGameProccessManager gameProccessManager, IGamesCrudService gamesCrudService)
+        public GameHub(IGamesManager gameProccessManager, IGamesCrudService gamesCrudService)
         {
             this.gameProccessManager = gameProccessManager;
             this.gamesCrudService = gamesCrudService;

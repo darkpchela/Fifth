@@ -66,19 +66,6 @@
     <script src="~/lib/tagify/jQuery.tagify.min.js"></script>
     <script>
         let tagify;
-        let input = document.querySelector('#tagsInput');
-        if (input) {
-            tagify = new Tagify(input, {
-                whitelist: [],
-                maxTags: 10,
-                dropdown: {
-                    maxItems: 20,
-                    classname: "tags-look",
-                    enabled: 0,
-                    closeOnSelect: false
-                }
-            })
-        }
 
         $('#tagsCloud a, #tagsFilter a').click((e) => {
             e.preventDefault();
@@ -111,6 +98,23 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <script @*src="~/js/index.js"*@>
+        const updateTagify = () => {
+            let input = document.querySelector('#tagsInput');
+            if (input) {
+                tagify = new Tagify(input, {
+                    whitelist: [],
+                    maxTags: 10,
+                    dropdown: {
+                        maxItems: 20,
+                        classname: "tags-look",
+                        enabled: 0,
+                        closeOnSelect: false
+                    }
+                });
+                getTagsAjax();
+            }
+        };
+
         const updateNewGameRef = () => {
             $('#newGame').click((e) => {
                 e.preventDefault();
@@ -133,6 +137,7 @@
                     $('#modalContent').empty();
                     $('#modalContent').append(data);
                     updateCreateGameRef();
+                    updateTagify();
                 }
             });
         }
@@ -167,7 +172,7 @@
         $(updateTableAjax());
         $(updateCreateGameRef());
         $(updateNewGameRef());
-        $(getTagsAjax());
+        $(updateTagify());
     </script>
     <script>
         function addCard(data) {
