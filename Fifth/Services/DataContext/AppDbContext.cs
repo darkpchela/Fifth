@@ -16,6 +16,7 @@ namespace Fifth.Services.DataContext
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
 
         public virtual DbSet<SessionData> SessionDatas { get; set; }
