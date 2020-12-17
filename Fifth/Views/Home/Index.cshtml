@@ -181,7 +181,8 @@
             cardElem.attr("data-id", data.id)
             $(cardElem).find('[name="game"]').text(data.name);
             $(cardElem).find('[name="user"]').text(data.userName);
-            $(cardElem).find('[name="ref"]').prop('href', `/Home/Game/${data.id}`)
+            $(cardElem).find('[name="ref"]').prop('href', `/Home/Game/${data.id}`);
+            $(cardElem).find();
             cardElem.prop('hidden', false);
             $('#gameCards').append(cardElem);
         };
@@ -196,7 +197,7 @@
         });
 
         hubConnection.on("OnGameCreated", gameVm => {
-            addCard(gameVm);
+            updateTableAjax();
         });
 
         hubConnection.start();

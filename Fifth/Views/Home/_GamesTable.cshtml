@@ -14,32 +14,22 @@
             </div>
         </div>
     </div>
-    @foreach (var g in  Model)
+    @foreach (var g in Model)
     {
-        <div data-id="@g.Id" class="p-2">
-            <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
-                <div class="card-body border rounded border-warning text-center">
-                    <h5 class="card-title"> @g.Name</h5>
-                    <h6 class="card-text">@g.UserName</h6>
-                    <a asp-action="Game" asp-route-id="@g.Id" class="text-warning">Join</a>
-                </div>
-                <div class="card-footer">
-                    @foreach(var t in await sessionTagService.GetTagsBySessionAsync(g.Id))
+        <div data-id="@g.Id">
+        <div  class="border rounded border-warning ml-1 mr-1 p-2 bg-secondary">
+            <div class="text-center text-monospace text-warning">
+                <h5 class="bg-dark rounded">@g.Name</h5>
+                <h6 class="bg-dark rounded ">@g.UserName</h6>
+                <div class="text-left bg-dark rounded align-content-center overflow-hidden">
+                    @foreach (var t in await sessionTagService.GetTagsBySessionAsync(g.Id))
                     {
                         <span>#@t.Value</span>
                     }
                 </div>
+                <a class="text-warning " asp-action="Game" asp-route-id="@g.Id">Join</a>
             </div>
         </div>
-    }
-</div>
-
-<div id="cardPrototype" data-id="" class="p-2" hidden>
-    <div class="card border rounded border-warning ml-1 mr-1 bg-secondary">
-        <div class="card-body border rounded border-warning text-center">
-            <h5 name="game" class="card-title"></h5>
-            <h6 name="user" class="card-text"></h6>
-            <a name="ref" class="text-warning">Join</a>
         </div>
-    </div>
+    }
 </div>
