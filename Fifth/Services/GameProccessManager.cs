@@ -4,7 +4,6 @@ using Fifth.Models;
 using Fifth.ViewModels;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -65,22 +64,21 @@ namespace Fifth.Services
             return true;
         }
 
-        public async Task<int> OpenGameAsync(CreateGameVM createGameVM)
+        public async Task<int> OpenGameAsync(CreateGameVM createGameVM, string userName)
         {
-            var user = await userCrudService.GetByLoginAsync(createGameVM.Username);
-            var gameId = await gamesCrudService.CreateAsync(createGameVM.Name, user);
-            if (!string.IsNullOrEmpty(createGameVM.Tags))
-            {
-                var tags = JsonConvert.DeserializeObject<Tag[]>(createGameVM.Tags).Select(t => t.Value);
-                await UpdateTags(gameId, tags);
-            }
-            await OnGameCreated(gameId);
-            return gameId;
+            var user = await userCrudService.GetByLoginAsync(userName);
+            await gamesCrudService.CreateAsync(createGameVM.Name, user);
+            var game = await gamesCrudService.GetGameAsync(createGameVM.Name);
+            if (!game.IsAlive())
+                return -1;
+            await UpdateTags(game.Data.Id, createGameVM.Tags);
+            await OnGameCreated(game);
+            return game.Data.Id;
         }
 
-        private async Task OnGameCreated(int gameId)
+        private async Task OnGameCreated(GameSession game)
         {
-            var game = await gamesCrudService.GetGameAsync(gameId);
+            ;
             var gameVm = mapper.Map<GameSessionVM>(game.Data);
             await hubContext.Clients.All.SendAsync("OnGameCreated", gameVm);
         }
@@ -90,8 +88,11 @@ namespace Fifth.Services
             await hubContext.Clients.All.SendAsync("OnGameStartedOrClosed", gameid);
         }
 
-        private async Task UpdateTags(int gameId, IEnumerable<string> values)
+        private async Task UpdateTags(int gameId, string tagsJson)
         {
+            if (string.IsNullOrEmpty(tagsJson))
+                return;
+            var values = JsonConvert.DeserializeObject<Tag[]>(tagsJson).Select(t => t.Value);
             foreach (var v in values)
             {
                 Tag tag = await tagCrudService.GetAsync(v);

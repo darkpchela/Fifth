@@ -1,16 +1,15 @@
-﻿using Fifth.Interfaces;
+﻿using AutoMapper;
+using Fifth.Interfaces;
+using Fifth.Models;
 using Fifth.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Text.Json;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using Fifth.Models;
+using System.Diagnostics;
 using System.Linq;
-using AutoMapper;
+using System.Threading.Tasks;
 
 namespace Fifth.Controllers
 {
@@ -24,7 +23,7 @@ namespace Fifth.Controllers
         private readonly IMapper mapper;
 
         public Home(IGameProccessManager gameManageService, IAppAuthenticationService authenticationService, ITagCrudService tagCrudService, ISessionTagCrudService sessionTagCrudService,
-            IGamesCrudService gamesCrudService ,IMapper mapper)
+            IGamesCrudService gamesCrudService, IMapper mapper)
         {
             this.gameManageService = gameManageService;
             this.authenticationService = authenticationService;
@@ -79,9 +78,13 @@ namespace Fifth.Controllers
         public async Task<IActionResult> CreateGame(CreateGameVM createGameVM)
         {
             if (!ModelState.IsValid)
-                return PartialView("_CreateGame" ,createGameVM);
-            createGameVM.Username = HttpContext.User.Identity.Name;
-            int id = await gameManageService.OpenGameAsync(createGameVM);
+                return PartialView("_CreateGame", createGameVM);
+            int id = await gameManageService.OpenGameAsync(createGameVM, HttpContext.User.Identity.Name);
+            if (id == -1)
+            {
+                ModelState.AddModelError("", "Name is already taken!");
+                return PartialView("_CreateGame", createGameVM);
+            }
             return PartialView("_GameCreated", id);
         }
 

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Fifth.ViewModels
 {
@@ -10,7 +9,5 @@ namespace Fifth.ViewModels
         public string Name { get; set; }
 
         public string Tags { get; set; }
-
-        public string Username { get; set; }
     }
 }

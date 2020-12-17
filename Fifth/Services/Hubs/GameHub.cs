@@ -59,14 +59,6 @@ namespace Fifth.Services
         private async Task TryStartGame(int gameId)
         {
             GameSession game = await gamesCrudService.GetGameAsync(gameId);
-            if (!game.IsAlive())
-                return;
-            else
-                await HandleStartGameRequest(game);
-        }
-
-        private async Task HandleStartGameRequest(GameSession game)
-        {
             var res = await gameProccessManager.TryStartGameAsync(game);
             if (res)
             {
