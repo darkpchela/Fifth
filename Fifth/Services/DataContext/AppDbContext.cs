@@ -27,7 +27,7 @@ namespace Fifth.Services.DataContext
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("name=Default");
+                optionsBuilder.UseSqlServer("name=default");
             }
         }
 
@@ -46,14 +46,18 @@ namespace Fifth.Services.DataContext
             });
 
             modelBuilder.Entity<SessionTag>(entity =>
-            { 
+            {
                 entity.HasIndex(e => e.SessionId, "IX_SessionTags_SessionId");
 
                 entity.HasOne(d => d.Session)
-                    .WithMany()
+                    .WithMany(p => p.SessionTags)
                     .HasForeignKey(d => d.SessionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_SessionTags_To_GameSessions");
+
+                entity.HasOne(d => d.Tag)
+                    .WithMany(p => p.SessionTags)
+                    .HasForeignKey(d => d.TagId)
+                    .HasConstraintName("FK_SessionTags_To_Tags");
             });
 
             modelBuilder.Entity<Tag>(entity =>
