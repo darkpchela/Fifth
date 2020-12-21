@@ -2,17 +2,17 @@
 {
     public class GameSession
     {
-        public GameInstance Instance { get; }
+        public GameProcess Instance { get; }
 
         public SessionData Data { get; }
 
         public GameSession(SessionData gameData)
         {
             this.Data = gameData;
-            this.Instance = new GameInstance(gameData.Id.ToString());
+            this.Instance = new GameProcess(gameData.Id.ToString());
         }
 
-        public GameSession(SessionData gameData, GameInstance gameInstance)
+        public GameSession(SessionData gameData, GameProcess gameInstance)
         {
             this.Data = gameData;
             this.Instance = gameInstance;

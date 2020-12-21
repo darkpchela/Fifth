@@ -1,12 +1,8 @@
 using Fifth.Extensions;
-using Fifth.Interfaces;
 using Fifth.Services;
-using Fifth.Services.BasicCRUD;
-using Fifth.Services.DataContext;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,16 +26,9 @@ namespace Fifth
             services.AddHttpContextAccessor();
             services.AddDistributedMemoryCache();
             services.AddSession();
-            services.AddDbContext<AppDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("Default")));
-            services.AddSingleton<IGameInstanceRepository, GameInstanceRepository>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddTransient<IAppAuthenticationService, AppAuthenticationService>();
-            services.AddTransient<ITagCrudService, TagCrudService>();
-            services.AddTransient<IUserCrudService, UserCrudService>();
-            services.AddTransient<IGamesCrudService, GamesCrudService>();
-            services.AddTransient<IGamesManager, GamesManager>();
-            services.AddTransient<ISessionTagCrudService, SessionTagCrudService>();
-            services.AddTransient<ITagCrudService, TagCrudService>();
+            services.AddAppContext(Configuration);
+            services.AddAuthenticationService();
+            services.AddGameServices();
             services.AddAutomapperProfiles();
             services.AddSignalR();
         }

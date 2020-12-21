@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Fifth.Models
 {
-    public class GameInstance
+    public class GameProcess
     {
         private char moveValue = 'x';
 
@@ -12,17 +12,24 @@ namespace Fifth.Models
 
         private char?[] map = new char?[9];
 
-        private Dictionary<char, UserConnection> charUser = new Dictionary<char, UserConnection>();
+        private List<UserConnection> players;
 
-        private List<UserConnection> players = new List<UserConnection>();
+        private Dictionary<char, UserConnection> charUser = new Dictionary<char, UserConnection>();
 
         public string Id { get; }
 
-        public bool IsReadyToStart { get; private set; }
-
         public UserConnection CurrentPlayer { get; private set; }
 
-        public GameInstance(string id)
+        public List<UserConnection> Players
+        {
+            get
+            {
+                return players ?? (players = new List<UserConnection>());
+            }
+        }
+
+
+        public GameProcess(string id)
         {
             this.Id = id;
         }
@@ -38,37 +45,13 @@ namespace Fifth.Models
             return res;
         }
 
-        public void StartGame()
+        public void PrepareToStart()
         {
             Random rnd = new Random();
             var index = rnd.Next(0, 2);
             CurrentPlayer = players[index];
             charUser.Add('x', CurrentPlayer);
             charUser.Add('o', players.FirstOrDefault(u => u != CurrentPlayer));
-        }
-
-        public bool RegistPlayer(string connectionId, User user)
-        {
-            if (players.Count >= 2 || string.IsNullOrEmpty(connectionId) || user is null)
-                return false;
-            AddConnection(connectionId, user);
-            if (players.Count == 2)
-                IsReadyToStart = true;
-            return true;
-        }
-
-        public IEnumerable<UserConnection> GetPlayers()
-        {
-            return players.ToList();
-        }
-
-        private void AddConnection(string connectionId, User user)
-        {
-            var player = players.FirstOrDefault(p => p.UserName == user.Login);
-            if (player != null)
-                players.Remove(player);
-            var connection = new UserConnection(user.Login, connectionId);
-            players.Add(connection);
         }
 
         private void SwapMoveValue()

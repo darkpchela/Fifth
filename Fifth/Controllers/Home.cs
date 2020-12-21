@@ -16,13 +16,13 @@ namespace Fifth.Controllers
     public class Home : Controller
     {
         private readonly IGamesManager gameManageService;
-        private readonly ITagCrudService tagCrudService;
+        private readonly ITagRepository tagCrudService;
         private readonly IAppAuthenticationService authenticationService;
-        private readonly ISessionTagCrudService sessionTagCrudService;
+        private readonly ISessionTagRepository sessionTagCrudService;
         private readonly IGamesCrudService gamesCrudService;
         private readonly IMapper mapper;
 
-        public Home(IGamesManager gameManageService, IAppAuthenticationService authenticationService, ITagCrudService tagCrudService, ISessionTagCrudService sessionTagCrudService,
+        public Home(IGamesManager gameManageService, IAppAuthenticationService authenticationService, ITagRepository tagCrudService, ISessionTagRepository sessionTagCrudService,
             IGamesCrudService gamesCrudService, IMapper mapper)
         {
             this.gameManageService = gameManageService;
