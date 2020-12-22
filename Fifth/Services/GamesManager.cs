@@ -13,7 +13,6 @@ namespace Fifth.Services
 {
     public class GamesManager : IGamesManager
     {
-
         private readonly IHubContext<MainHub> hubContext;
 
         private readonly ITagsProvider tagsProvider;
@@ -65,12 +64,15 @@ namespace Fifth.Services
             return Task.FromResult(process);
         }
 
-        public bool IsAlive(int id)
+        public async Task<bool> IsAlive(int id)
         {
             var proccess = unitOfWork.GameProcessRepository.Get(id.ToString());
             var data = unitOfWork.SessionDataRepository.Get(id);
             if (data is null || proccess is null)
+            {
+                await CloseGameAsync(id);
                 return false;
+            }
             return true;
         }
 

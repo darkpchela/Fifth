@@ -14,10 +14,11 @@ namespace Fifth.Services
 
         private readonly IHubContext<MainHub> hubContext;
 
-        public GameProcessManager(IGamesManager gamesManager, IHubContext<MainHub> hubContext)
+        public GameProcessManager(IGamesManager gamesManager, IHubContext<MainHub> hubContext, IUnitOfWork unitOfWork)
         {
             this.gamesManager = gamesManager;
             this.hubContext = hubContext;
+            this.unitOfWork = unitOfWork;
         }
 
         public async Task<MoveResult> MakeMove(int gameId, string connectionId, int position)
@@ -29,7 +30,7 @@ namespace Fifth.Services
 
         public async Task<bool> RegistPlayer(int gameId, string connectionId, string userName )
         {
-            if (!gamesManager.IsAlive(gameId))
+            if (!await gamesManager.IsAlive(gameId))
                 return false;
             var proccess = await gamesManager.GetProcess(gameId);
             if (proccess.Players.Count >= 2)
@@ -41,7 +42,7 @@ namespace Fifth.Services
 
         public async Task<bool> StartGame(int id)
         {
-            if (!gamesManager.IsAlive(id))
+            if (!await gamesManager.IsAlive(id))
                 return false;
             var proccess = await gamesManager.GetProcess(id);
             if (proccess.Players.Count != 2)

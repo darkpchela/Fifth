@@ -1,6 +1,5 @@
 ﻿using Fifth.Models;
 using Fifth.ViewModels;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Fifth.Interfaces
@@ -15,7 +14,6 @@ namespace Fifth.Interfaces
 
         Task<GameProcess> GetProcess(int id);
 
-        bool IsAlive(int id);
-
+        Task<bool> IsAlive(int id);
     }
 }

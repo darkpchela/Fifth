@@ -41,17 +41,10 @@ namespace Fifth.Services
         public async Task AcceptMoveRequest(string index)
         {
             int gameId = GetCurrentGameId();
-            if (!gamesManager.IsAlive(gameId))
+            if (!await gamesManager.IsAlive(gameId))
                 await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
             else if (int.TryParse(index, out int posIndex))
                 await HandleMoveRequest(gameId, posIndex);
-        }
-
-        private async Task SendPlayersInfo()
-        {
-            int gameId = GetCurrentGameId();
-            var game = await gamesManager.GetProcess(gameId);
-            await Clients.Group(gameId.ToString()).SendAsync("AcceptPlayersInfo", game.Players.Select(e => e.UserName));
         }
 
         private async Task TryStartGame(int gameId)
@@ -77,11 +70,16 @@ namespace Fifth.Services
         private async Task TryEnterGame(int gameId)
         {
             var res = await gameProcessManager.RegistPlayer(gameId, Context.ConnectionId, Context.User.Identity.Name);
-            await Clients.Group(gameId.ToString()).SendAsync("OnPlayerEntered", Context.User.Identity.Name, Context.ConnectionId, res);
             if (!res)
+            {
+                await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
                 Context.Abort();
+            }
             else
-                await SendPlayersInfo();
+            {
+                var game = await gamesManager.GetProcess(gameId);
+                await Clients.Group(gameId.ToString()).SendAsync("AcceptPlayersInfo", game.Players);
+            }
         }
 
         private async Task AssignChars(GameProcess game)
