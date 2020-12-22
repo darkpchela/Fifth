@@ -88,7 +88,7 @@ const getTagsAjax = () => {
 const updateTableAjax = (tags) => {
     $.ajax({
         type: "POST",
-        url: "Home/_GamesTable",
+        url: "Home/GamesTable",
         data: { "tagsJson": tags },
         success: data => {
             $('#gamesTable').empty();

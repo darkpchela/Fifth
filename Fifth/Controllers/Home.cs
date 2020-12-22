@@ -33,12 +33,12 @@ namespace Fifth.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> _GamesTable(string tagsJson)
+        public async Task<IActionResult> GamesTable(string tagsJson)
         {
             IEnumerable<SessionData> sessions = await tagsProvider.GetSessionsByTag(tagsJson);
             var allowed = sessions.Where(s => !s.Started);
             var VMs = mapper.Map<IEnumerable<SessionVM>>(allowed.ToList());
-            return PartialView(VMs);
+            return PartialView("_GamesTable", VMs);
         }
 
         [HttpGet]
