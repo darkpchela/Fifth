@@ -1,5 +1,4 @@
-﻿using Fifth.Interfaces;
-using Fifth.Interfaces.DataAccess;
+﻿using Fifth.Interfaces.DataAccess;
 using Fifth.Services.DataContext.Repositories;
 using System.Threading.Tasks;
 
@@ -19,7 +18,7 @@ namespace Fifth.Services.DataContext
 
         private ITagRepository tagRepository;
 
-        private IUserRepository userRepository; 
+        private IUserRepository userRepository;
 
         public UnitOfWork(AppDbContext dbContext, IGameProcessesContext processesContext)
         {

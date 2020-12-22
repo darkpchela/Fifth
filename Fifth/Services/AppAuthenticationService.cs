@@ -15,11 +15,13 @@ namespace Fifth.Services
     {
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly AppDbContext dbContext;
+
         public AppAuthenticationService(IHttpContextAccessor httpContextAccessor, AppDbContext dbContext)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.dbContext = dbContext;
         }
+
         public async Task<bool> SignUpAsync(string userName, string password)
         {
             if (await dbContext.Users.AnyAsync(u => u.Login == userName))
@@ -45,7 +47,6 @@ namespace Fifth.Services
             return true;
         }
 
-
         public async Task SignOutAsync()
         {
             await httpContextAccessor.HttpContext.SignOutAsync();
@@ -53,7 +54,7 @@ namespace Fifth.Services
 
         private async Task Authenticate(string userName)
         {
-            var claims = new List<Claim> 
+            var claims = new List<Claim>
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
             };

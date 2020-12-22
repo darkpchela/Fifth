@@ -1,11 +1,8 @@
-﻿using AutoMapper;
-using Fifth.Interfaces;
+﻿using Fifth.Interfaces;
 using Fifth.Interfaces.DataAccess;
 using Fifth.Models;
 using Fifth.ViewModels;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,12 +16,9 @@ namespace Fifth.Services
 
         private readonly IUnitOfWork unitOfWork;
 
-        private readonly IMapper mapper;
-
-        public GamesManager(IHubContext<MainHub> hubContext, IMapper mapper, IUnitOfWork unitOfWork, ITagsProvider tagsProvider)
+        public GamesManager(IHubContext<MainHub> hubContext, IUnitOfWork unitOfWork, ITagsProvider tagsProvider)
         {
             this.hubContext = hubContext;
-            this.mapper = mapper;
             this.unitOfWork = unitOfWork;
             this.tagsProvider = tagsProvider;
         }
@@ -39,6 +33,8 @@ namespace Fifth.Services
 
         public async Task<int> CreateGameAsync(CreateGameVM createGameVM, string userName)
         {
+            if (unitOfWork.SessionDataRepository.GetAll().Any(sd => sd.Name == createGameVM.Name))
+                return -1;
             var user = unitOfWork.UserRepository.Get(userName);
             var data = new SessionData
             {
@@ -103,6 +99,5 @@ namespace Fifth.Services
         {
             await hubContext.Clients.All.SendAsync("UpdateGamesTable");
         }
-
     }
 }

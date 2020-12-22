@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using Fifth.Interfaces;
-using Fifth.Interfaces.DataAccess;
 using Fifth.Models;
 using Fifth.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,16 +15,12 @@ namespace Fifth.Controllers
     public class Home : Controller
     {
         private readonly IGamesManager gamesManager;
-        private readonly IAppAuthenticationService authenticationService;
         private readonly IMapper mapper;
-        private readonly IUnitOfWork unitOfWork;
         private readonly ITagsProvider tagsProvider;
 
-        public Home(IGamesManager gamesManager, IAppAuthenticationService authenticationService, IUnitOfWork unitOfWork, ITagsProvider tagsProvider,IMapper mapper)
+        public Home(IGamesManager gamesManager, ITagsProvider tagsProvider, IMapper mapper)
         {
             this.gamesManager = gamesManager;
-            this.authenticationService = authenticationService;
-            this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.tagsProvider = tagsProvider;
         }
@@ -36,12 +30,12 @@ namespace Fifth.Controllers
             return View();
         }
 
-
         [HttpPost]
         public async Task<IActionResult> _GamesTable(string tagsJson)
         {
             IEnumerable<SessionData> sessions = await tagsProvider.GetSessionsByTag(tagsJson);
-            var VMs = mapper.Map<IEnumerable<SessionVM>>(sessions.ToList());
+            var allowed = sessions.Where(s => !s.Started);
+            var VMs = mapper.Map<IEnumerable<SessionVM>>(allowed.ToList());
             return PartialView(VMs);
         }
 

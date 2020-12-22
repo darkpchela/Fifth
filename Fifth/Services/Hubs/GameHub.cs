@@ -1,5 +1,4 @@
 ﻿using Fifth.Interfaces;
-using Fifth.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -25,39 +24,33 @@ namespace Fifth.Services
             int gameId = GetCurrentGameId();
             await Clients.Caller.SendAsync("AcceptConnectionId", Context.ConnectionId);
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
-            await TryEnterGame(gameId);
+            if (await gameProcessManager.RegistPlayer(gameId, Context.ConnectionId, Context.User.Identity.Name))
+                await gameProcessManager.StartGame(gameId);
+            else
+            {
+                await Clients.Caller.SendAsync("OnDisconnect");
+                Context.Abort();
+            }
         }
 
         public async override Task OnDisconnectedAsync(Exception exception)
         {
             int gameId = GetCurrentGameId();
-            await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
-            await gamesManager.CloseGameAsync(gameId);
+            var process = await gamesManager.GetProcess(gameId);
+            if (process != null && process.GetState().Players.Any(p => p.ConnectionId == Context.ConnectionId))
+            {
+                await gamesManager.CloseGameAsync(gameId);
+                await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
+            }
         }
 
-        public async Task AcceptMoveRequest(string position)
+        public async Task MakeMove(string position)
         {
             int gameId = GetCurrentGameId();
             if (!await gamesManager.IsAlive(gameId))
                 await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
             else if (int.TryParse(position, out int index))
                 await gameProcessManager.MakeMove(gameId, Context.ConnectionId, index);
-        }
-
-        private async Task TryEnterGame(int gameId)
-        {
-            var res = await gameProcessManager.RegistPlayer(gameId, Context.ConnectionId, Context.User.Identity.Name);
-            if (!res)
-            {
-                await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
-                Context.Abort();
-            }
-            else
-            { 
-                var game = await gamesManager.GetProcess(gameId);
-                await Clients.Group(gameId.ToString()).SendAsync("AcceptPlayersInfo", game.GetState().Players);
-                await gameProcessManager.StartGame(gameId);
-            }
         }
 
         private int GetCurrentGameId()

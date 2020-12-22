@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Fifth.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Fifth.Models;
 
 #nullable disable
 

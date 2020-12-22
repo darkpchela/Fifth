@@ -1,5 +1,4 @@
 ﻿using Fifth.Interfaces;
-using Fifth.Interfaces.DataAccess;
 using Fifth.Models;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
@@ -10,14 +9,11 @@ namespace Fifth.Services
     {
         private IGamesManager gamesManager;
 
-        private readonly IUnitOfWork unitOfWork;
-
         private readonly IHubContext<GameHub> gameHubContext;
 
-        public GameProcessManager(IGamesManager gamesManager, IUnitOfWork unitOfWork, IHubContext<GameHub> gameHubContext)
+        public GameProcessManager(IGamesManager gamesManager, IHubContext<GameHub> gameHubContext)
         {
             this.gamesManager = gamesManager;
-            this.unitOfWork = unitOfWork;
             this.gameHubContext = gameHubContext;
         }
 
@@ -43,6 +39,8 @@ namespace Fifth.Services
             using (GameMaster gameMaster = new GameMaster(proccess))
             {
                 var res = gameMaster.RegistPlayer(connectionId, userName);
+                if (res)
+                    await SendPlayersInfo(gameId);
                 return res;
             }
         }
@@ -68,6 +66,12 @@ namespace Fifth.Services
             var starter = game.GetState().CurrentPlayer;
             await gameHubContext.Clients.GroupExcept(game.Id, starter.ConnectionId).SendAsync("AcceptChar", "o");
             await gameHubContext.Clients.Client(starter.ConnectionId).SendAsync("AcceptChar", "x");
+        }
+
+        private async Task SendPlayersInfo(int gameId)
+        {
+            var game = await gamesManager.GetProcess(gameId);
+            await gameHubContext.Clients.Group(gameId.ToString()).SendAsync("AcceptPlayersInfo", game.GetState().Players);
         }
     }
 }

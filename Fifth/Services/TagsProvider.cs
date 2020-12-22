@@ -2,7 +2,6 @@
 using Fifth.Interfaces.DataAccess;
 using Fifth.Models;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +26,7 @@ namespace Fifth.Services
         {
             if (!TryDeserializeTags(tagsJson, out Tag[] tags))
                 return;
-            foreach (var v in tags.Select(t=>t.Value))
+            foreach (var v in tags.Select(t => t.Value))
             {
                 Tag tag = unitOfWork.TagRepository.Get(v);
                 if (tag is null)
@@ -41,7 +40,7 @@ namespace Fifth.Services
                 }
                 SessionTag sessionTag = new SessionTag
                 {
-                    SessionId =sessionId,
+                    SessionId = sessionId,
                     Tag = tag
                 };
                 unitOfWork.SessionTagRepository.Create(sessionTag);
