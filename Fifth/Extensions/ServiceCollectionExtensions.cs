@@ -26,7 +26,11 @@ namespace Fifth.Extensions
 
         public static IServiceCollection AddAppContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<AppDbContext>(o => o.UseSqlServer(configuration.GetConnectionString("Default")));
+            services.AddDbContext<AppDbContext>(o =>
+            {
+                o.UseSqlServer(configuration.GetConnectionString("Default"));
+                o.UseLazyLoadingProxies();
+            });
             services.AddSingleton<IGameProcessesContext, GameProcessesContext>();
             services.AddTransient<IGameProcessRepository, GameProcessRepository>();
             services.AddTransient<ISessionDataRepository, SessionDataRepository>();

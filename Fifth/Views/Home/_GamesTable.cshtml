@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<SessionVM>
-@inject Fifth.Interfaces.ISessionTagCrudService sessionTagService
+@inject Fifth.Interfaces.ITagsProvider tagsProvider
 
 <div class="h-75">
 
@@ -32,7 +32,7 @@
                     <h6 class="bg-dark rounded overflow-hidden ">@g.UserName</h6>
                     <div class="text-left bg-dark rounded align-content-center overflow-hidden">
                         @{
-                            var tags = await sessionTagService.GetTagsBySessionAsync(g.Id);
+                            var tags = await tagsProvider.GetTagsBySession(g.Id);
                             if (tags.Count() == 0)
                             {
                                 <span>#[Notags]</span>

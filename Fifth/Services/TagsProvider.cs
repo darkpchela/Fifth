@@ -18,6 +18,11 @@ namespace Fifth.Services
             this.unitOfWork = unitOfWork;
         }
 
+        public Task<IEnumerable<Tag>> GetAllTags()
+        {
+            return Task.FromResult(unitOfWork.TagRepository.GetAll());
+        }
+
         public async Task AssignTags(int sessionId, string tagsJson)
         {
             if (!TryDeserializeTags(tagsJson, out Tag[] tags))
@@ -43,16 +48,24 @@ namespace Fifth.Services
             }
         }
 
-        public Task<IEnumerable<SessionData>> GetSessionsByTag(IEnumerable<int> tagIds)
+        public Task<IEnumerable<SessionData>> GetSessionsByTag(IEnumerable<Tag> tags)
         {
             var allSessionsTags = unitOfWork.SessionTagRepository.GetAll();
             var sessions = allSessionsTags.Select(e => e.Session);
-            foreach (var id in tagIds)
+            foreach (var tag in tags)
             {
-                var filtered = allSessionsTags.Where(st => st.TagId == id).Select(s => s.Session);
+                var filtered = allSessionsTags.Where(st => st.TagId == tag.Id).Select(s => s.Session);
                 sessions = sessions.Intersect(filtered);
             }
             return Task.FromResult(sessions.Distinct());
+        }
+
+        public Task<IEnumerable<SessionData>> GetSessionsByTag(string tagsJson)
+        {
+            if (string.IsNullOrEmpty(tagsJson) || !TryDeserializeTags(tagsJson, out Tag[] tags))
+                return Task.FromResult(unitOfWork.SessionDataRepository.GetAll());
+            var sessions = GetSessionsByTag(tags);
+            return sessions;
         }
 
         public Task<IEnumerable<Tag>> GetTagsBySession(int sessionId)

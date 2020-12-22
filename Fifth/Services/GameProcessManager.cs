@@ -20,14 +20,21 @@ namespace Fifth.Services
             this.hubContext = hubContext;
         }
 
-        public async Task<bool> RegistPlayer(string connectionId, string login, int gameId)
+        public async Task<MoveResult> MakeMove(int gameId, string connectionId, int position)
+        {
+            var game = await gamesManager.GetProcess(gameId);
+            var res = game.MakeMove(position, connectionId);
+            return res;
+        }
+
+        public async Task<bool> RegistPlayer(int gameId, string connectionId, string userName )
         {
             if (!gamesManager.IsAlive(gameId))
                 return false;
             var proccess = await gamesManager.GetProcess(gameId);
             if (proccess.Players.Count >= 2)
                 return false;
-            var connection = new UserConnection(login, connectionId);
+            var connection = new UserConnection(userName, connectionId);
             proccess.Players.Add(connection);
             return true;
         }

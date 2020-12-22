@@ -21,9 +21,10 @@ namespace Fifth.Services.DataContext
 
         private IUserRepository userRepository; 
 
-        public UnitOfWork(AppDbContext dbContext)
+        public UnitOfWork(AppDbContext dbContext, IGameProcessesContext processesContext)
         {
             this.dbContext = dbContext;
+            this.processesContext = processesContext;
         }
 
         public IGameProcessRepository GameProcessRepository

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Fifth.Interfaces;
+using Fifth.Interfaces.DataAccess;
 using Fifth.Models;
 using Fifth.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -15,22 +16,19 @@ namespace Fifth.Controllers
 {
     public class Home : Controller
     {
-        private readonly IGamesManager gameManageService;
-        private readonly ITagRepository tagCrudService;
+        private readonly IGamesManager gamesManager;
         private readonly IAppAuthenticationService authenticationService;
-        private readonly ISessionTagRepository sessionTagCrudService;
-        private readonly IGamesCrudService gamesCrudService;
         private readonly IMapper mapper;
+        private readonly IUnitOfWork unitOfWork;
+        private readonly ITagsProvider tagsProvider;
 
-        public Home(IGamesManager gameManageService, IAppAuthenticationService authenticationService, ITagRepository tagCrudService, ISessionTagRepository sessionTagCrudService,
-            IGamesCrudService gamesCrudService, IMapper mapper)
+        public Home(IGamesManager gamesManager, IAppAuthenticationService authenticationService, IUnitOfWork unitOfWork, ITagsProvider tagsProvider,IMapper mapper)
         {
-            this.gameManageService = gameManageService;
+            this.gamesManager = gamesManager;
             this.authenticationService = authenticationService;
-            this.tagCrudService = tagCrudService;
-            this.sessionTagCrudService = sessionTagCrudService;
-            this.gamesCrudService = gamesCrudService;
+            this.unitOfWork = unitOfWork;
             this.mapper = mapper;
+            this.tagsProvider = tagsProvider;
         }
 
         public IActionResult Index()
@@ -42,14 +40,7 @@ namespace Fifth.Controllers
         [HttpPost]
         public async Task<IActionResult> _GamesTable(string tagsJson)
         {
-            List<SessionData> sessions;
-            if (string.IsNullOrEmpty(tagsJson))
-                sessions = (await gamesCrudService.GetAllGamesAsync()).Select(g => g.Data).Where(g => !g.Started).ToList();
-            else
-            {
-                var inputTags = JsonConvert.DeserializeObject<Tag[]>(tagsJson).Select(t => t.Id);
-                sessions = (await sessionTagCrudService.GetSessionsByTagAsync(inputTags)).ToList();
-            }
+            IEnumerable<SessionData> sessions = await tagsProvider.GetSessionsByTag(tagsJson);
             var VMs = mapper.Map<IEnumerable<SessionVM>>(sessions);
             return PartialView(VMs);
         }
@@ -57,7 +48,7 @@ namespace Fifth.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTags()
         {
-            var tags = await tagCrudService.GetAll();
+            var tags = await tagsProvider.GetAllTags();
             return Json(tags);
         }
 
@@ -75,7 +66,7 @@ namespace Fifth.Controllers
         {
             if (!ModelState.IsValid)
                 return PartialView("_CreateGame", createGameVM);
-            int id = await gameManageService.OpenGameAsync(createGameVM, HttpContext.User.Identity.Name);
+            int id = await gamesManager.CreateGameAsync(createGameVM, HttpContext.User.Identity.Name);
             if (id == -1)
             {
                 ModelState.AddModelError("", "Name is already taken!");

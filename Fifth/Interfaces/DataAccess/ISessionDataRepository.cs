@@ -1,5 +1,4 @@
-﻿using Fifth.DataAccess.Interfaces;
-using Fifth.Models;
+﻿using Fifth.Models;
 
 namespace Fifth.Interfaces.DataAccess
 {
