@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Fifth.Models
 {
@@ -20,16 +18,17 @@ namespace Fifth.Models
             this.after = gameProcess.GetState();
         }
 
-        public MoveResult MakeMove(int postion, string connectionId)
+        public bool MakeMove(int postion, string connectionId, out MoveResult moveResult)
         {
+            moveResult = new MoveResult();
             if (connectionId != before.CurrentPlayer.ConnectionId || postion < 0 || postion > 8 || before.Map[postion] != null || before.MovesCount >= 9)
-                return new MoveResult(false);
+                return false;
             after.Map[postion] = before.MoveValue;
             SwapMoveValue();
             SwapCurrentPlayer();
-            MoveResult res = CalcResult();
+            moveResult = CalcResult();
             gameProcess.SetState(after);
-            return res;
+            return true;
         }
 
         public bool PrepareToStart()
@@ -74,14 +73,19 @@ namespace Fifth.Models
 
         private MoveResult CalcResult()
         {
-            if (!CheckLines(before.Map, 3, out char? value))
-                if (!CheckColumns(before.Map, 3, out value))
-                    if (!CheckDiagonals(before.Map, 3, out value))
-                        if (before.MovesCount < 9)
-                            return new MoveResult(true);
-                        else
-                            return new MoveResult();
-            return new MoveResult($"{before.CharToPlayer[value.Value].UserName}");
+            MoveResult result = new MoveResult();
+            if (!CheckLines(before.Map, 3, out char? value) && !CheckColumns(before.Map, 3, out value) && !CheckDiagonals(before.Map, 3, out value))
+            {
+                if (before.MovesCount >= 9)
+                {
+                    result.IsDraw = true;
+                    result.GameFinished = true;
+                }
+                return result;
+            }
+            result.GameFinished = true;
+            result.Winner = before.CharToPlayer[value.Value].UserName;
+            return result;
         }
 
         private bool CheckLines(char?[] array, int rowLength, out char? value)
@@ -186,6 +190,6 @@ namespace Fifth.Models
             Dispose(false);
         }
 
-        #endregion
+        #endregion Disposable
     }
 }

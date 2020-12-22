@@ -36,13 +36,13 @@ namespace Fifth.Services
             await gamesManager.CloseGameAsync(gameId);
         }
 
-        public async Task AcceptMoveRequest(string index)
+        public async Task AcceptMoveRequest(string position)
         {
             int gameId = GetCurrentGameId();
             if (!await gamesManager.IsAlive(gameId))
                 await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
-            else if (int.TryParse(index, out int posIndex))
-                await HandleMoveRequest(gameId, posIndex);
+            else if (int.TryParse(position, out int index))
+                await gameProcessManager.MakeMove(gameId, Context.ConnectionId, index);
         }
 
         private async Task TryStartGame(int gameId)
@@ -53,15 +53,6 @@ namespace Fifth.Services
             var game = await gamesManager.GetProcess(gameId);
             await AssignChars(game);
             await Clients.Groups(game.Id.ToString()).SendAsync("OnGameStarted");
-        }
-
-        private async Task HandleMoveRequest(int id, int index)
-        {
-            var res = await gameProcessManager.MakeMove(id, Context.ConnectionId, index);
-            if (res.MoveMaid)
-                await Clients.Group(id.ToString()).SendAsync("OnMoveMaid", index);
-            if (res.GameFinished)
-                await Clients.Group(id.ToString()).SendAsync("OnGameOver", res);
         }
 
         private async Task TryEnterGame(int gameId)

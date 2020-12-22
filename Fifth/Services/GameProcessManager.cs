@@ -21,13 +21,17 @@ namespace Fifth.Services
             this.gameHubContext = gameHubContext;
         }
 
-        public async Task<MoveResult> MakeMove(int gameId, string connectionId, int position)
+        public async Task MakeMove(int gameId, string connectionId, int position)
         {
             var game = await gamesManager.GetProcess(gameId);
             using (GameMaster gameMaster = new GameMaster(game))
             {
-                var res = gameMaster.MakeMove(position, connectionId);
-                return res;
+                var res = gameMaster.MakeMove(position, connectionId, out MoveResult moveResult);
+                if (!res)
+                    return;
+                await gameHubContext.Clients.Group(gameId.ToString()).SendAsync("OnMoveMaid", position);
+                if (moveResult.GameFinished)
+                    await gameHubContext.Clients.Group(gameId.ToString()).SendAsync("OnGameOver", moveResult);
             }
         }
 
