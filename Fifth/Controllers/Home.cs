@@ -15,7 +15,9 @@ namespace Fifth.Controllers
     public class Home : Controller
     {
         private readonly IGamesManager gamesManager;
+
         private readonly IMapper mapper;
+
         private readonly ITagsProvider tagsProvider;
 
         public Home(IGamesManager gamesManager, ITagsProvider tagsProvider, IMapper mapper)
