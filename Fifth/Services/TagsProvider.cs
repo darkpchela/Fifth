@@ -51,7 +51,7 @@ namespace Fifth.Services
         public Task<IEnumerable<SessionData>> GetSessionsByTag(IEnumerable<Tag> tags)
         {
             var allSessionsTags = unitOfWork.SessionTagRepository.GetAll();
-            var sessions = allSessionsTags.Select(e => e.Session);
+            var sessions = unitOfWork.SessionDataRepository.GetAll();
             foreach (var tag in tags)
             {
                 var filtered = allSessionsTags.Where(st => st.TagId == tag.Id).Select(s => s.Session);
@@ -70,11 +70,10 @@ namespace Fifth.Services
 
         public Task<IEnumerable<Tag>> GetTagsBySession(int sessionId)
         {
-            var allSessionTags = unitOfWork.SessionTagRepository.GetAll();
-            var allTags = unitOfWork.TagRepository.GetAll();
-            var tagsId = allSessionTags.Where(s => s.SessionId == sessionId).Select(st => st.TagId);
-            var tags = allTags.Where(t => tagsId.Contains(t.Id));
-            return Task.FromResult(tags);
+            var tags = unitOfWork.SessionTagRepository.GetAll()
+                .Where(st => st.Id == sessionId)
+                .Select(st => st.Tag);
+            return Task.FromResult(tags.AsEnumerable());
         }
 
         private bool TryDeserializeTags(string tagsJson, out Tag[] tags)

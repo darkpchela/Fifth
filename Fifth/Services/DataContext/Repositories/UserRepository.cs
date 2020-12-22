@@ -35,7 +35,7 @@ namespace Fifth.Services.DataContext.Repositories
 
         public IEnumerable<User> GetAll()
         {
-            return dbContext.Users.AsNoTracking();
+            return dbContext.Users;
         }
 
         public void Update(User entity)

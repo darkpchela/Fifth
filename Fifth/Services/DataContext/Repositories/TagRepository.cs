@@ -41,7 +41,7 @@ namespace Fifth.Services.DataContext.Repositories
 
         public IEnumerable<Tag> GetAll()
         {
-            return dbContext.Tags.AsNoTracking();
+            return dbContext.Tags;
         }
 
         public void Update(Tag entity)

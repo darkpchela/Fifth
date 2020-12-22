@@ -34,7 +34,7 @@ namespace Fifth.Services.DataContext.Repositories
 
         public IEnumerable<SessionTag> GetAll()
         {
-            return dbContext.SessionTags.AsNoTracking();
+            return dbContext.SessionTags;
         }
 
         public void Update(SessionTag entity)

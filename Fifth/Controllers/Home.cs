@@ -41,7 +41,7 @@ namespace Fifth.Controllers
         public async Task<IActionResult> _GamesTable(string tagsJson)
         {
             IEnumerable<SessionData> sessions = await tagsProvider.GetSessionsByTag(tagsJson);
-            var VMs = mapper.Map<IEnumerable<SessionVM>>(sessions);
+            var VMs = mapper.Map<IEnumerable<SessionVM>>(sessions.ToList());
             return PartialView(VMs);
         }
 
