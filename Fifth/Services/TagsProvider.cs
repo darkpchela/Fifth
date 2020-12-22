@@ -46,6 +46,7 @@ namespace Fifth.Services
                 };
                 unitOfWork.SessionTagRepository.Create(sessionTag);
             }
+            await unitOfWork.SaveChanges();
         }
 
         public Task<IEnumerable<SessionData>> GetSessionsByTag(IEnumerable<Tag> tags)
@@ -54,7 +55,7 @@ namespace Fifth.Services
             var sessions = unitOfWork.SessionDataRepository.GetAll();
             foreach (var tag in tags)
             {
-                var filtered = allSessionsTags.Where(st => st.TagId == tag.Id).Select(s => s.Session);
+                var filtered = allSessionsTags.Where(st => st.TagId == tag.Id).ToList().Select(s => s.Session);
                 sessions = sessions.Intersect(filtered);
             }
             return Task.FromResult(sessions.Distinct());
@@ -70,9 +71,8 @@ namespace Fifth.Services
 
         public Task<IEnumerable<Tag>> GetTagsBySession(int sessionId)
         {
-            var tags = unitOfWork.SessionTagRepository.GetAll()
-                .Where(st => st.Id == sessionId)
-                .Select(st => st.Tag);
+            var stags = unitOfWork.SessionTagRepository.GetAll().Where(st => st.SessionId == sessionId).ToList();
+            var tags = stags.Select(st => st.Tag);
             return Task.FromResult(tags.AsEnumerable());
         }
 

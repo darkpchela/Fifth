@@ -12,13 +12,16 @@ namespace Fifth.Services
 
         private readonly IUnitOfWork unitOfWork;
 
-        private readonly IHubContext<MainHub> hubContext;
+        private readonly IHubContext<MainHub> mainHubContext;
 
-        public GameProcessManager(IGamesManager gamesManager, IHubContext<MainHub> hubContext, IUnitOfWork unitOfWork)
+        private readonly IHubContext<GameHub> gameHubContext;
+
+        public GameProcessManager(IGamesManager gamesManager,IUnitOfWork unitOfWork, IHubContext<MainHub> mainHubContext, IHubContext<GameHub> gameHubContext)
         {
             this.gamesManager = gamesManager;
-            this.hubContext = hubContext;
+            this.mainHubContext = mainHubContext;
             this.unitOfWork = unitOfWork;
+            this.gameHubContext = gameHubContext;
         }
 
         public async Task<MoveResult> MakeMove(int gameId, string connectionId, int position)
@@ -58,7 +61,7 @@ namespace Fifth.Services
 
         private async void OnGameStarted()
         {
-            await hubContext.Clients.All.SendAsync("UpdateGamesTable");
+            await mainHubContext.Clients.All.SendAsync("UpdateGamesTable");
         }
     }
 }
