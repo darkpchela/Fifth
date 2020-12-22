@@ -26,7 +26,6 @@ namespace Fifth.Services
             await Clients.Caller.SendAsync("AcceptConnectionId", Context.ConnectionId);
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
             await TryEnterGame(gameId);
-            await TryStartGame(gameId);
         }
 
         public async override Task OnDisconnectedAsync(Exception exception)
@@ -45,16 +44,6 @@ namespace Fifth.Services
                 await gameProcessManager.MakeMove(gameId, Context.ConnectionId, index);
         }
 
-        private async Task TryStartGame(int gameId)
-        {
-            var res = await gameProcessManager.StartGame(gameId);
-            if (!res)
-                return;
-            var game = await gamesManager.GetProcess(gameId);
-            await AssignChars(game);
-            await Clients.Groups(game.Id.ToString()).SendAsync("OnGameStarted");
-        }
-
         private async Task TryEnterGame(int gameId)
         {
             var res = await gameProcessManager.RegistPlayer(gameId, Context.ConnectionId, Context.User.Identity.Name);
@@ -64,17 +53,11 @@ namespace Fifth.Services
                 Context.Abort();
             }
             else
-            {
+            { 
                 var game = await gamesManager.GetProcess(gameId);
                 await Clients.Group(gameId.ToString()).SendAsync("AcceptPlayersInfo", game.GetState().Players);
+                await gameProcessManager.StartGame(gameId);
             }
-        }
-
-        private async Task AssignChars(GameProcess game)
-        {
-            var starter = game.GetState().CurrentPlayer;
-            await Clients.GroupExcept(game.Id, starter.ConnectionId).SendAsync("AcceptChar", "o");
-            await Clients.Client(starter.ConnectionId).SendAsync("AcceptChar", "x");
         }
 
         private int GetCurrentGameId()

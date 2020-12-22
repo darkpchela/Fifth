@@ -1,5 +1,4 @@
-﻿using Fifth.Models;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Fifth.Interfaces
 {
@@ -9,6 +8,6 @@ namespace Fifth.Interfaces
 
         Task<bool> RegistPlayer(int gameId, string connectionId, string userName);
 
-        Task<bool> StartGame(int gameId);
+        Task StartGame(int gameId);
     }
 }

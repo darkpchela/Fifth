@@ -47,16 +47,27 @@ namespace Fifth.Services
             }
         }
 
-        public async Task<bool> StartGame(int id)
+        public async Task StartGame(int gameId)
         {
-            if (!await gamesManager.IsAlive(id))
-                return false;
-            var proccess = await gamesManager.GetProcess(id);
+            if (!await gamesManager.IsAlive(gameId))
+                return;
+            var proccess = await gamesManager.GetProcess(gameId);
             using (GameMaster gameMaster = new GameMaster(proccess))
             {
                 var res = gameMaster.PrepareToStart();
-                return res;
+                if (!res)
+                    return;
+                await SendChars(gameId);
+                await gameHubContext.Clients.Groups(gameId.ToString()).SendAsync("OnGameStarted");
             }
+        }
+
+        private async Task SendChars(int gameId)
+        {
+            var game = await gamesManager.GetProcess(gameId);
+            var starter = game.GetState().CurrentPlayer;
+            await gameHubContext.Clients.GroupExcept(game.Id, starter.ConnectionId).SendAsync("AcceptChar", "o");
+            await gameHubContext.Clients.Client(starter.ConnectionId).SendAsync("AcceptChar", "x");
         }
     }
 }
