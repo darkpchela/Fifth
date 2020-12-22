@@ -12,14 +12,11 @@ namespace Fifth.Services
 
         private readonly IUnitOfWork unitOfWork;
 
-        private readonly IHubContext<MainHub> mainHubContext;
-
         private readonly IHubContext<GameHub> gameHubContext;
 
-        public GameProcessManager(IGamesManager gamesManager,IUnitOfWork unitOfWork, IHubContext<MainHub> mainHubContext, IHubContext<GameHub> gameHubContext)
+        public GameProcessManager(IGamesManager gamesManager, IUnitOfWork unitOfWork, IHubContext<GameHub> gameHubContext)
         {
             this.gamesManager = gamesManager;
-            this.mainHubContext = mainHubContext;
             this.unitOfWork = unitOfWork;
             this.gameHubContext = gameHubContext;
         }
@@ -51,17 +48,7 @@ namespace Fifth.Services
             if (proccess.Players.Count != 2)
                 return false;
             proccess.PrepareToStart();
-            var data = await gamesManager.GetData(id);
-            data.Started = true;
-            unitOfWork.SessionDataRepository.Update(data);
-            await unitOfWork.SaveChanges();
-            OnGameStarted();
             return true;
-        }
-
-        private async void OnGameStarted()
-        {
-            await mainHubContext.Clients.All.SendAsync("UpdateGamesTable");
         }
     }
 }

@@ -34,6 +34,7 @@ namespace Fifth.Services
             unitOfWork.SessionDataRepository.Delete(id);
             unitOfWork.GameProcessRepository.Delete(id.ToString());
             await unitOfWork.SaveChanges();
+            await OnGameClosed();
         }
 
         public async Task<int> CreateGameAsync(CreateGameVM createGameVM, string userName)
@@ -49,6 +50,7 @@ namespace Fifth.Services
             var proccess = new GameProcess(data.Id.ToString());
             unitOfWork.GameProcessRepository.Create(proccess);
             await tagsProvider.AssignTags(data.Id, createGameVM.Tags);
+            await OnGameCreated();
             return data.Id;
         }
 
@@ -76,12 +78,28 @@ namespace Fifth.Services
             return true;
         }
 
+        public async Task SetStart(int gameId)
+        {
+            var data = await GetData(gameId);
+            if (data is null)
+                return;
+            data.Started = true;
+            unitOfWork.SessionDataRepository.Update(data);
+            await unitOfWork.SaveChanges();
+            await OnGameStarted();
+        }
+
         private async Task OnGameCreated()
         {
             await hubContext.Clients.All.SendAsync("UpdateGamesTable");
         }
 
-        private async Task OnGameStartedOrClosed()
+        private async Task OnGameStarted()
+        {
+            await hubContext.Clients.All.SendAsync("UpdateGamesTable");
+        }
+
+        private async Task OnGameClosed()
         {
             await hubContext.Clients.All.SendAsync("UpdateGamesTable");
         }
