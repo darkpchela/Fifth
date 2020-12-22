@@ -76,7 +76,7 @@ namespace Fifth.Models
             MoveResult result = new MoveResult();
             if (!CheckLines(before.Map, 3, out char? value) && !CheckColumns(before.Map, 3, out value) && !CheckDiagonals(before.Map, 3, out value))
             {
-                if (before.MovesCount >= 9)
+                if (before.MovesCount == 8)
                 {
                     result.IsDraw = true;
                     result.GameFinished = true;
