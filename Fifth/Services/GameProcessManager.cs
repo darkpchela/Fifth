@@ -24,20 +24,23 @@ namespace Fifth.Services
         public async Task<MoveResult> MakeMove(int gameId, string connectionId, int position)
         {
             var game = await gamesManager.GetProcess(gameId);
-            var res = game.MakeMove(position, connectionId);
-            return res;
+            using (GameMaster gameMaster = new GameMaster(game))
+            {
+                var res = gameMaster.MakeMove(position, connectionId);
+                return res;
+            }
         }
 
-        public async Task<bool> RegistPlayer(int gameId, string connectionId, string userName )
+        public async Task<bool> RegistPlayer(int gameId, string connectionId, string userName)
         {
             if (!await gamesManager.IsAlive(gameId))
                 return false;
             var proccess = await gamesManager.GetProcess(gameId);
-            if (proccess.Players.Count >= 2)
-                return false;
-            var connection = new UserConnection(userName, connectionId);
-            proccess.Players.Add(connection);
-            return true;
+            using (GameMaster gameMaster = new GameMaster(proccess))
+            {
+                var res = gameMaster.RegistPlayer(connectionId, userName);
+                return res;
+            }
         }
 
         public async Task<bool> StartGame(int id)
@@ -45,10 +48,11 @@ namespace Fifth.Services
             if (!await gamesManager.IsAlive(id))
                 return false;
             var proccess = await gamesManager.GetProcess(id);
-            if (proccess.Players.Count != 2)
-                return false;
-            proccess.PrepareToStart();
-            return true;
+            using (GameMaster gameMaster = new GameMaster(proccess))
+            {
+                var res = gameMaster.PrepareToStart();
+                return res;
+            }
         }
     }
 }

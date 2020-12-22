@@ -27,7 +27,6 @@ namespace Fifth.Services
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
             await TryEnterGame(gameId);
             await TryStartGame(gameId);
-            await base.OnConnectedAsync();
         }
 
         public async override Task OnDisconnectedAsync(Exception exception)
@@ -35,7 +34,6 @@ namespace Fifth.Services
             int gameId = GetCurrentGameId();
             await Clients.Group(gameId.ToString()).SendAsync("OnDisconnect");
             await gamesManager.CloseGameAsync(gameId);
-            await base.OnDisconnectedAsync(exception);
         }
 
         public async Task AcceptMoveRequest(string index)
@@ -59,12 +57,11 @@ namespace Fifth.Services
 
         private async Task HandleMoveRequest(int id, int index)
         {
-            var game = await gamesManager.GetProcess(id);
-            var res = game.MakeMove(index, Context.ConnectionId);
+            var res = await gameProcessManager.MakeMove(id, Context.ConnectionId, index);
             if (res.MoveMaid)
-                await Clients.Group(game.Id).SendAsync("OnMoveMaid", index);
+                await Clients.Group(id.ToString()).SendAsync("OnMoveMaid", index);
             if (res.GameFinished)
-                await Clients.Group(game.Id).SendAsync("OnGameOver", res);
+                await Clients.Group(id.ToString()).SendAsync("OnGameOver", res);
         }
 
         private async Task TryEnterGame(int gameId)
@@ -78,13 +75,13 @@ namespace Fifth.Services
             else
             {
                 var game = await gamesManager.GetProcess(gameId);
-                await Clients.Group(gameId.ToString()).SendAsync("AcceptPlayersInfo", game.Players);
+                await Clients.Group(gameId.ToString()).SendAsync("AcceptPlayersInfo", game.GetState().Players);
             }
         }
 
         private async Task AssignChars(GameProcess game)
         {
-            var starter = game.CurrentPlayer;
+            var starter = game.GetState().CurrentPlayer;
             await Clients.GroupExcept(game.Id, starter.ConnectionId).SendAsync("AcceptChar", "o");
             await Clients.Client(starter.ConnectionId).SendAsync("AcceptChar", "x");
         }
