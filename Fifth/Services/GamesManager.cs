@@ -27,6 +27,7 @@ namespace Fifth.Services
             this.hubContext = hubContext;
             this.mapper = mapper;
             this.unitOfWork = unitOfWork;
+            this.tagsProvider = tagsProvider;
         }
 
         public async Task CloseGameAsync(int id)
